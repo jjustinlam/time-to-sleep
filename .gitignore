@@ -17,6 +17,9 @@ log.txt
 /.versions
 /coverage
 
+# VS Code
+/.vscode
+
 # Ionic
 /.ionic
 /www
