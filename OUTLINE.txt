@@ -1,0 +1,45 @@
+Rough Outline
+-------------
+
+Stored values (using @capacitor/storage):
+
+// Send a notification this amount of time before recommended sleep time to tell the user when to begin winding down for the day
+WIND_DOWN_TIME := 1 hour
+
+// When to wake up the user for in person classes ?
+wind_up_time := 1 hour
+
+// When to wake up the user for remote synchronous classes ?
+wind_up_time_remote := 30 minutes 
+
+// When to wake up the user for remote asynchronous classes ?
+wind_up_time_async := null
+
+// Recommended times to sleep and to wakeup by day (based on recommended_overnight_sleep)
+recommended_times_by_day := {
+	monday: {sleep: 11pm, wakeup: 8am}, 
+	...
+}
+
+// Recommended length of time needed, by default
+recommended_overnight_sleep := 9 hours
+
+// Sleepiness scores throughout the day
+sleepiness := {
+	averages: {
+		monday: {average, running_total, num_samples}
+	}
+	records: {} // Store (datetime:DateTime, sleepiness:number) pairs
+}
+
+On init:
+Prompt and ask the user if they are a morning or night person. Change recommended_times_by_day accordingly.
+Ask the user for their course schedule (also indicating if the class is in person, remote synchronous, or remote asynchronous), shift the times accordingly based on first class and last class for each night (and morning after). 
+Ask the user how much time they'd prefer to have before the first class (e.g. considering commute time and morning routine). Should always be available to be changed by the user.
+
+On usage:
+Then, based on average sleepiness throughout the day, shift accordingly (more sleepy => sleep earlier, more awake => relax time to sleep)
+Ask the user how awake/sleepy they are 1) when they wake up, 2) sometime in the midday, and 3) before they sleep. Use (1) to "rate" how well the length of sleep was the previous night; if tired, raise the length needed. Use the average sleepiness (avg(1,2,3)) to shift sleep accordingly (as above)
+
+Shifting sleep times: 
+Sleep can only be recommended to begin no earlier than 1 hour after the last class of the day. Wakeup (alarm) can be recommended OR set up manually by the user, no later
