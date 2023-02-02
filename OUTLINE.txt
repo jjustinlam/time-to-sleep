@@ -6,6 +6,8 @@ Rough Outline
 /* 
 We can either use @capacitor-community/sqlite, or some online database (e.g. Firebase)
 For more simple (non-dynamic) items, we can use @capacitor/preferences (e.g. to use for settings or constants)
+
+Use JSON.stringify() and JSON.parse() to convert between JSON and strings
 */
 
 // Send a notification this amount of time before recommended sleep time to tell the user when to begin winding down for the day
@@ -33,6 +35,7 @@ recommended_overnight_sleep := 9 hours
 sleepiness := {
 	averages: {
 		monday: {average, running_total, num_samples}
+		...
 	}
 	records: {} // Store (datetime:DateTime, sleepiness:number) pairs
 }
