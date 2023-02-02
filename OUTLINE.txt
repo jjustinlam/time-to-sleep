@@ -1,7 +1,7 @@
 Rough Outline
 -------------
 
-Stored values (using @capacitor/storage):
+*** Stored values (using @capacitor/storage): ***
 
 // Send a notification this amount of time before recommended sleep time to tell the user when to begin winding down for the day
 WIND_DOWN_TIME := 1 hour
@@ -31,6 +31,10 @@ sleepiness := {
 	}
 	records: {} // Store (datetime:DateTime, sleepiness:number) pairs
 }
+
+
+
+*** Process ***
 
 On init:
 Prompt and ask the user if they are a morning or night person. Change recommended_times_by_day accordingly.
