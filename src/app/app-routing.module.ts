@@ -10,6 +10,22 @@ const routes: Routes = [
   {
     path: 'folder/:id',
     loadChildren: () => import('./folder/folder.module').then( m => m.FolderPageModule)
+  },
+  {
+    path: 'my-schedule',
+    loadChildren: () => import('./pages/my-schedule/my-schedule.module').then( m => m.MySchedulePageModule)
+  },
+  {
+    path: 'overnight-sleep',
+    loadChildren: () => import('./pages/overnight-sleep/overnight-sleep.module').then( m => m.OvernightSleepPageModule)
+  },
+  {
+    path: 'sleepiness',
+    loadChildren: () => import('./pages/sleepiness/sleepiness.module').then( m => m.SleepinessPageModule)
+  },
+  {
+    path: 'settings',
+    loadChildren: () => import('./pages/settings/settings.module').then( m => m.SettingsPageModule)
   }
 ];
 
