@@ -8,6 +8,8 @@ import { MySchedulePageRoutingModule } from './my-schedule-routing.module';
 
 import { MySchedulePage } from './my-schedule.page';
 
+import { VisualScheduleComponent } from 'src/app/components/visual-schedule/visual-schedule.component';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -15,6 +17,9 @@ import { MySchedulePage } from './my-schedule.page';
     IonicModule,
     MySchedulePageRoutingModule
   ],
-  declarations: [MySchedulePage]
+  declarations: [
+    MySchedulePage,
+    VisualScheduleComponent
+  ]
 })
 export class MySchedulePageModule {}

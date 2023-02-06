@@ -1,9 +1,13 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>my-schedule</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>My Schedule</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <p>My Schedule</p>
+  <app-visual-schedule></app-visual-schedule>
 </ion-content>
