@@ -1,3 +1,48 @@
-<p>
-  visual-schedule works!
-</p>
+<ion-grid>
+  <ion-row>
+    <ion-col><ion-button (click)="show_study_list()">
+      <ion-label>Study List</ion-label>
+    </ion-button></ion-col>
+    <ion-col><ion-button (click)="show_calendar()">
+      <ion-label>Calendar</ion-label>
+    </ion-button></ion-col>
+  </ion-row>
+</ion-grid>
+
+<ion-card *ngIf="display == 'study-list'">
+  <div *ngIf="courses.length > 0">
+    <ion-list>
+      <ion-item-sliding *ngFor="let course of courses">
+        <ion-item color="none" lines="none">
+          <ion-card-content>
+
+          </ion-card-content>
+        </ion-item>
+
+        <ion-item-options>
+          <ion-item-option id="item-option" (click)="remove_course(course)" class="bg-transparent">
+            <ion-icon slot="icon-only" color="primary" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+
+      </ion-item-sliding>
+    </ion-list>
+  </div>
+
+  <div *ngIf="courses.length < 1">
+    <ion-card-content>No courses to display</ion-card-content>
+  </div>
+</ion-card>
+
+<ion-card *ngIf="display == 'calendar'">
+  <ion-card-content>
+    Calendar
+  </ion-card-content>  
+</ion-card>
+
+<div id="fixed-bottom">
+  <ion-button>
+    <ion-icon slot="start" name="add-outline"></ion-icon>
+    <ion-label>Add a course</ion-label>
+  </ion-button>
+</div>

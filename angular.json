@@ -135,6 +135,7 @@
   },
   "cli": {
     "schematicCollections": [
+      "@schematics/angular",
       "@ionic/angular-toolkit"
     ],
     "analytics": false
