@@ -15,7 +15,25 @@
       <ion-item-sliding *ngFor="let course of courses">
         <ion-item color="none" lines="none">
           <ion-card-content>
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <p>{{course.course_name}}</p>
+                </ion-col>
+                <ion-col>
+                  <p>{{course.days}}</p>
+                </ion-col>
+              </ion-row>
 
+              <ion-row>
+                <ion-col>
+                  <p>{{course.course_type}}</p>
+                </ion-col>
+                <ion-col>
+                  <p>{{course.time_start_str()}} - {{course.time_end_str}}</p>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
           </ion-card-content>
         </ion-item>
 
@@ -41,8 +59,71 @@
 </ion-card>
 
 <div id="fixed-bottom">
-  <ion-button>
+  <ion-button id="open-new-entry-modal" expand="block">
     <ion-icon slot="start" name="add-outline"></ion-icon>
     <ion-label>Add a course</ion-label>
   </ion-button>
 </div>
+
+<ion-modal trigger="open-new-entry-modal" [initialBreakpoint]="0.9" [breakpoints]="[0, 0.9]">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-button id="confirm" (click)="confirm()" slot="end">
+          <ion-icon name="checkmark"></ion-icon>
+        </ion-button>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+
+      <ion-grid>
+        <ion-row>
+          <ion-col><p>S</p></ion-col>
+          <ion-col><p>M</p></ion-col>
+          <ion-col><p>T</p></ion-col>
+          <ion-col><p>W</p></ion-col>
+          <ion-col><p>T</p></ion-col>
+          <ion-col><p>F</p></ion-col>
+          <ion-col><p>S</p></ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days.sunday"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days.monday"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days.tuesday"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days.wednesday"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days.thursday"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days.friday"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days.saturday"></ion-checkbox></ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-button id="time-start-value">{{time_start_str()}}</ion-button>
+            <ion-modal trigger="time-start-value" [keepContentsMounted]="true" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]">
+              <ng-template>
+                <ion-datetime id="time-start" presentation="time" [(ngModel)]="time_start"></ion-datetime>
+              </ng-template>
+            </ion-modal>
+          </ion-col>
+
+          <ion-col size="1">
+            <p>-</p>
+          </ion-col>
+
+          <ion-col>
+            <ion-button id="time-end-value">{{time_end_str()}}</ion-button>
+            <ion-modal trigger="time-end-value" [keepContentsMounted]="true" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]">
+              <ng-template>
+                <ion-datetime id="time-end" presentation="time" [(ngModel)]="time_end"></ion-datetime>
+              </ng-template>
+            </ion-modal>
+          </ion-col>
+
+        </ion-row>
+      </ion-grid>
+
+    </ion-content>
+  </ng-template>
+</ion-modal>

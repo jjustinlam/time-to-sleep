@@ -1,0 +1,11 @@
+ion-col {
+	text-align: center;
+}
+
+ion-checkbox {
+	--size: 20px;
+}
+
+ion-checkbox::part(container) {
+	border-radius: 6px;
+}

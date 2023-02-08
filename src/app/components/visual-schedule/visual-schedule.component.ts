@@ -10,6 +10,18 @@ export class VisualScheduleComponent implements OnInit {
   display:string = "study-list";
   courses = Array<Course>();
 
+  selected_days = {
+    sunday: false,
+    monday: false,
+    tuesday: false,
+    wednesday: false,
+    thursday: false,
+    friday: false,
+    saturday: false,
+  }
+  time_start = new Date(0, 0, 1, 8, 0);
+  time_end = new Date(0, 0, 1, 8, 50);
+
   constructor() { }
 
   ngOnInit() {
@@ -32,6 +44,32 @@ export class VisualScheduleComponent implements OnInit {
   remove_course(course:Course) {
     this.courses.filter((c) => {return c !== course});
     // TO DO: Remove from DB
+  }
+
+  reset_days() {
+    this.selected_days = {
+      sunday: false,
+      monday: false,
+      tuesday: false,
+      wednesday: false,
+      thursday: false,
+      friday: false,
+      saturday: false, 
+    }
+    this.time_start = new Date(0, 0, 1, 8, 0);
+    this.time_end = new Date(0, 0, 1, 8, 50);
+  }
+
+  time_start_str() {
+    return new Date(this.time_start).toLocaleTimeString('en-US', {timeStyle: 'short'});
+  }
+
+  time_end_str() {
+    return new Date(this.time_end).toLocaleTimeString('en-US', {timeStyle: 'short'});
+  }
+
+  confirm() {
+    // TO DO
   }
 
 }
