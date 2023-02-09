@@ -65,11 +65,11 @@
   </ion-button>
 </div>
 
-<ion-modal trigger="open-new-entry-modal" [initialBreakpoint]="0.9" [breakpoints]="[0, 0.9]">
+<ion-modal trigger="open-new-entry-modal" [initialBreakpoint]="0.9" [breakpoints]="[0, 0.9]" (onDismiss)="reset_modal()">
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-button id="confirm" (click)="confirm()" slot="end">
+        <ion-button id="confirm" (click)="confirm()" slot="end" [color]="(is_valid()) ? 'success' : 'danger'">
           <ion-icon name="checkmark"></ion-icon>
         </ion-button>
       </ion-toolbar>
@@ -87,15 +87,20 @@
           <ion-col><p>S</p></ion-col>
         </ion-row>
         <ion-row>
-          <ion-col><ion-checkbox [(ngModel)]="selected_days.sunday"></ion-checkbox></ion-col>
-          <ion-col><ion-checkbox [(ngModel)]="selected_days.monday"></ion-checkbox></ion-col>
-          <ion-col><ion-checkbox [(ngModel)]="selected_days.tuesday"></ion-checkbox></ion-col>
-          <ion-col><ion-checkbox [(ngModel)]="selected_days.wednesday"></ion-checkbox></ion-col>
-          <ion-col><ion-checkbox [(ngModel)]="selected_days.thursday"></ion-checkbox></ion-col>
-          <ion-col><ion-checkbox [(ngModel)]="selected_days.friday"></ion-checkbox></ion-col>
-          <ion-col><ion-checkbox [(ngModel)]="selected_days.saturday"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days[0]"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days[1]"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days[2]"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days[3]"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days[4]"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days[5]"></ion-checkbox></ion-col>
+          <ion-col><ion-checkbox [(ngModel)]="selected_days[6]"></ion-checkbox></ion-col>
         </ion-row>
       </ion-grid>
+
+      <ion-item fill="solid" class="ion-padding">
+        <ion-label position="floating">Course</ion-label>
+        <ion-input placeholder="Enter course name" [(ngModel)]="course_name"></ion-input>
+      </ion-item>
 
       <ion-grid>
         <ion-row>
@@ -107,11 +112,7 @@
               </ng-template>
             </ion-modal>
           </ion-col>
-
-          <ion-col size="1">
-            <p>-</p>
-          </ion-col>
-
+          <ion-col size="1"><p>-</p></ion-col>
           <ion-col>
             <ion-button id="time-end-value">{{time_end_str()}}</ion-button>
             <ion-modal trigger="time-end-value" [keepContentsMounted]="true" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]">
@@ -120,9 +121,28 @@
               </ng-template>
             </ion-modal>
           </ion-col>
-
+        </ion-row>
+        <ion-row>
+          <ion-col></ion-col>
+          <ion-col size="1"></ion-col>
+          <ion-col>
+            <ion-chip *ngIf="duration() < 1" color="danger">
+              <ion-icon name="alert-circle"></ion-icon>
+              <ion-label>Invalid time</ion-label>
+            </ion-chip>
+          </ion-col>
         </ion-row>
       </ion-grid>
+
+      <ion-list>
+        <ion-item>
+          <ion-select interface="action-sheet" placeholder="Select course type" [(ngModel)]="course_type">
+            <ion-select-option value="in-person">In person</ion-select-option>
+            <ion-select-option value="sync-remote">Syncronous remote</ion-select-option>
+            <ion-select-option value="async-remote">Asyncronous remote</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
 
     </ion-content>
   </ng-template>
