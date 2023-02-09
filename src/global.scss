@@ -43,17 +43,14 @@
 	bottom: 25px;
 }
 
-.bg-transparent {
-	background: transparent;
-}
-
-ion-datetime {
-	--button-color: var(--ion-color-primary-contrast);
-}
-
 .action-sheet-group {
 	--background: var(--ion-color-primary);
 	--button-background-selected: var(--ion-color-primary);
 	--button-color: var(--ion-color-secondary);
 	--button-color-selected: var(--ion-color-secondary);
+}
+
+.bg-transparent {
+	background: transparent;
+	--background: var(--ion-background-color);
 }

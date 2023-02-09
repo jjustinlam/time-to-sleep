@@ -2,10 +2,41 @@ ion-col {
 	text-align: center;
 }
 
+ion-item {
+	text-align: center;
+	--padding-bottom: 0;
+	--padding-top: 0;
+	--padding-end: 0;
+	--padding-start: 0;
+	--inner-padding-bottom: 0;
+	--inner-padding-top: 0;
+	--inner-padding-end: 0;
+	--inner-padding-start: 0;
+}
+
+.item-fill-space {
+    width: 100%;
+}
+
 ion-checkbox {
 	--size: 20px;
 }
 
 ion-checkbox::part(container) {
 	border-radius: 6px;
+}
+
+ion-datetime {
+	text-align: center;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+}
+
+.ion-page {
+	display: flex;
+	text-align: center;
+	padding: 0;
+	position: relative;
+	width: 100%;
 }

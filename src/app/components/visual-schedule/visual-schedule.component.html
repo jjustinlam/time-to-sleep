@@ -9,32 +9,34 @@
   </ion-row>
 </ion-grid>
 
-<ion-card *ngIf="display == 'study-list'">
+<div *ngIf="display == 'study-list'">
   <div *ngIf="courses.length > 0">
-    <ion-list>
-      <ion-item-sliding *ngFor="let course of courses">
-        <ion-item color="none" lines="none">
-          <ion-card-content>
-            <ion-grid>
-              <ion-row>
-                <ion-col>
-                  <p>{{course.course_name}}</p>
-                </ion-col>
-                <ion-col>
-                  <p>{{course.days}}</p>
-                </ion-col>
-              </ion-row>
+    <ion-list class="bg-transparent">
+      <ion-item-sliding *ngFor="let course of courses" class="bg-transparent">
+        <ion-item lines="none" class="bg-transparent ion-no-padding ion-align-items-center ion-justify-content-center">
+          <ion-card class="item-fill-space">
+            <ion-card-content>
+              <ion-grid [fixed]="true">
+                <ion-row>
+                  <ion-col>
+                    <p>{{course.course_name}}</p>
+                  </ion-col>
+                  <ion-col>
+                    <p>{{course.days}}</p>
+                  </ion-col>
+                </ion-row>
 
-              <ion-row>
-                <ion-col>
-                  <p>{{course.course_type}}</p>
-                </ion-col>
-                <ion-col>
-                  <p>{{course.time_start_str()}} - {{course.time_end_str}}</p>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </ion-card-content>
+                <ion-row>
+                  <ion-col>
+                    <p>{{course.course_type}}</p>
+                  </ion-col>
+                  <ion-col>
+                    <p>{{course.time_start_str()}} - {{course.time_end_str()}}</p>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
         </ion-item>
 
         <ion-item-options>
@@ -48,9 +50,12 @@
   </div>
 
   <div *ngIf="courses.length < 1">
-    <ion-card-content>No courses to display</ion-card-content>
+    <ion-card>
+      <ion-card-content>No courses to display</ion-card-content>
+    </ion-card>
   </div>
-</ion-card>
+
+</div>
 
 <ion-card *ngIf="display == 'calendar'">
   <ion-card-content>
@@ -108,7 +113,7 @@
             <ion-button id="time-start-value">{{time_start_str()}}</ion-button>
             <ion-modal trigger="time-start-value" [keepContentsMounted]="true" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]">
               <ng-template>
-                <ion-datetime id="time-start" presentation="time" [(ngModel)]="time_start"></ion-datetime>
+                <ion-datetime id="time-start" presentation="time" [(ngModel)]="time_start" minuteValues="0,5,10,15,20,25,30,35,40,45,50,55"></ion-datetime>
               </ng-template>
             </ion-modal>
           </ion-col>
@@ -117,7 +122,7 @@
             <ion-button id="time-end-value">{{time_end_str()}}</ion-button>
             <ion-modal trigger="time-end-value" [keepContentsMounted]="true" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]">
               <ng-template>
-                <ion-datetime id="time-end" presentation="time" [(ngModel)]="time_end"></ion-datetime>
+                <ion-datetime id="time-end" presentation="time" [(ngModel)]="time_end" minuteValues="0,5,10,15,20,25,30,35,40,45,50,55"></ion-datetime>
               </ng-template>
             </ion-modal>
           </ion-col>
@@ -137,9 +142,9 @@
       <ion-list>
         <ion-item>
           <ion-select interface="action-sheet" placeholder="Select course type" [(ngModel)]="course_type">
-            <ion-select-option value="in-person">In person</ion-select-option>
-            <ion-select-option value="sync-remote">Syncronous remote</ion-select-option>
-            <ion-select-option value="async-remote">Asyncronous remote</ion-select-option>
+            <ion-select-option value="In person">In person</ion-select-option>
+            <ion-select-option value="Syncronous remote">Syncronous remote</ion-select-option>
+            <ion-select-option value="Asynchronous remote">Asyncronous remote</ion-select-option>
           </ion-select>
         </ion-item>
       </ion-list>

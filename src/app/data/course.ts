@@ -5,16 +5,16 @@ export class Course {
 	time_start:Date;
 	time_end:Date;
 
-	constructor(course_name:string, course_type:string, selected_days:any, time_start:Date, time_end:Date) {
+	constructor(course_name:string, course_type:string, selected_days:Array<boolean>, time_start:Date, time_end:Date) {
 		this.course_name = course_name;
 		this.course_type = course_type;
-		this.days = (selected_days.sunday) 		? "S" : " " +
-					(selected_days.monday) 		? "M" : " " +
-					(selected_days.tuesday) 	? "T" : " " +
-					(selected_days.wednesday) 	? "W" : " " +
-					(selected_days.thursday) 	? "T" : " " +
-					(selected_days.friday) 		? "F" : " " +
-					(selected_days.saturday) 	? "S" : " ";
+		this.days = (selected_days[0]) 	? "S" : "_" +
+					(selected_days[1]) 	? "M" : "_" +
+					(selected_days[2]) 	? "T" : "_" +
+					(selected_days[3]) 	? "W" : "_" +
+					(selected_days[4]) 	? "T" : "_" +
+					(selected_days[5]) 	? "F" : "_" +
+					(selected_days[6]) 	? "S" : "_" ;
 		this.time_start = time_start;
 		this.time_end = time_end;
 	}

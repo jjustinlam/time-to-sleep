@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Course } from 'src/app/data/course';
 import { IonModal } from '@ionic/angular';
+
+import { Course } from 'src/app/data/course';
+import { PersonalModelService } from 'src/app/services/personal-model.service';
 
 @Component({
   selector: 'app-visual-schedule',
@@ -11,7 +13,6 @@ export class VisualScheduleComponent implements OnInit {
   @ViewChild(IonModal) modal: IonModal;
 
   display:string = "study-list";
-  courses = Array<Course>();
 
   selected_days = [false, false, false, false, false, false, false]; // selected_days[0] is Sunday
   time_start = new Date();
@@ -19,11 +20,15 @@ export class VisualScheduleComponent implements OnInit {
   course_type = "";
   course_name = "";
 
-  constructor() { }
+  constructor(private personal_model:PersonalModelService) {}
 
   ngOnInit() {
     this.reset_modal();
     // TO DO: Load schedule from database, if it exists
+  }
+
+  get courses() {
+    return PersonalModelService.courses;
   }
 
   show_study_list() {
@@ -34,14 +39,14 @@ export class VisualScheduleComponent implements OnInit {
     this.display = "calendar";
   }
 
-  add_course(course_name:string, course_type:string, days:string, time_start:Date, time_end:Date) {
-    this.courses.push(new Course(course_name, course_type, days, time_start, time_end));
-    // TO DO: Push to DB 
+  add_course() {
+    this.personal_model.add_course(
+      new Course(this.course_name, this.course_type, this.selected_days, this.time_start, this.time_end)
+    );
   }
 
   remove_course(course:Course) {
-    this.courses.filter((c) => {return c !== course});
-    // TO DO: Remove from DB
+    this.personal_model.remove_course(course);
   }
 
   reset_modal() {
@@ -49,7 +54,7 @@ export class VisualScheduleComponent implements OnInit {
     this.time_start.setHours(8);
     this.time_start.setMinutes(0);
     this.time_end.setHours(8);
-    this.time_end.setHours(50);
+    this.time_end.setMinutes(50);
     this.course_type = "";
     this.course_name = "";
   }
@@ -76,12 +81,14 @@ export class VisualScheduleComponent implements OnInit {
   }
 
   confirm() {
-    if (new Date(this.time_end).getTime() - this.time_start.getTime() > 0) {
+    if (this.is_valid()) {
       // TO DO
+      this.add_course();
       this.modal.dismiss();
     } else {
       // present alert about invalid end time
     }
+    this.reset_modal();
   }
 
 }
