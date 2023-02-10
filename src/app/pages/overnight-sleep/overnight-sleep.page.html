@@ -7,8 +7,26 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div id="container">
-    <p>Overnight Sleep</p>
-  </div>
+<ion-content id="container">
+  <h1>Recommended sleep</h1>
+  <ion-card>
+    <ion-card-content id="alarm-card">
+      <p>We set an alarm for</p>
+      <h1><strong>8:00 AM</strong></h1> <!-- TO DO: Change to tomorrow's recommended alarm time OR user's overriden alarm time (if applicable)-->
+      <p>(in 12 hours)</p>
+      <ion-button slot="end"> <!-- TO DO: (click)="set_manual_alarm()" -->
+        <ion-icon slot="start" name="pencil"></ion-icon>
+        <ion-label>Set manually</ion-label>
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <h1>Your sleep last night</h1>
+  <ion-card>
+    <ion-card-content>
+      <ion-label>7 hours 15 mintues</ion-label> <!-- TO DO: Change to yesterday's sleep length -->
+      <ion-icon slot="end" name="arrow-forward"></ion-icon>
+    </ion-card-content>
+  </ion-card>
+  <ion-button>See more</ion-button> <!-- TO DO: Create page modal to scroll through (retrieve) entries from database in reverse date order (recent first) -->
 </ion-content>

@@ -7,8 +7,28 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div id="container">
-    <p>Settings</p>
-  </div>
+<ion-content id="container">
+  <h1>User preferences</h1>
+  <ion-card>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>You are a morning person</ion-label> <!-- TO DO: Change to morning or night person based on what's in the database (check in ngInit())-->
+        <ion-button slot="end">
+          <ion-icon name="sunny"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <h1>Fitness integration</h1>
+  <ion-card>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>Connect your fitness app</ion-label>
+        <ion-button slot="end">
+          <ion-icon name="arrow-forward"></ion-icon> <!-- TO DO: Fitness app integration (if integrated, give open to disconnect fitness app instead)-->
+        </ion-button>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

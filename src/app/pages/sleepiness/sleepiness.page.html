@@ -7,8 +7,45 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div id="container">
-    <p>Sleepiness</p>
-  </div>
+<ion-content id="container">
+    <h1>Your typical sleepiness alertness on Wednesdays</h1> <!-- TO DO: Retrieve typical sleep on today's day -->
+    <div class="row">
+      <ion-icon class="ion-padding" name="battery-half" color="success"></ion-icon> <!-- TO DO: Change icon between battery-full, battery-half, and battery-empty based on alertness levels -->
+      <p class=" ion-padding huge-text">7</p>
+    </div>
+    <p>with an average of</p>
+    <p>8 hours 10 minutes</p>
+    <p>of sleep</p>
 </ion-content>
+
+<div id="fixed-bottom">
+  <ion-button id="open-tiredness-modal" expand="block">
+    <ion-icon slot="start" name="add-outline"></ion-icon>
+    <ion-label>How tired are you?</ion-label>
+  </ion-button>
+</div>
+
+<ion-modal trigger="open-tiredness-modal" [initialBreakpoint]="0.9" [breakpoints]="[0, 0.9]">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-button id="confirm" (click)="confirm()" slot="end" color="primary">
+          <ion-icon name="checkmark"></ion-icon>
+        </ion-button>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <ion-card class="ion-text-center ion-padding">
+        <ion-card-header>
+          <ion-card-title>How tired are you right now?</ion-card-title>
+        </ion-card-header>
+      </ion-card>
+
+      <ion-range [(ngModel)]="logged_value" [ticks]="true" [snaps]="true" [min]="1" [max]="7" [pin]="true" [pinFormatter]="pin_formatter">
+        <ion-icon name="sunny" slot="start"></ion-icon>
+        <ion-icon name="moon" slot="end"></ion-icon>
+      </ion-range>
+    </ion-content>
+  </ng-template>
+</ion-modal>

@@ -28,11 +28,18 @@
 /* How do you center a div? */
 #container {
 	text-align: center;
-	position: absolute;
-	left: 0;
-	right: 0;
+	// position: absolute;
+	// left: 0;
+	// right: 0;
 	// top: 50%;
 	// transform: translateY(-50%);
+}
+
+.row {
+	display: flex;
+	text-align: center;
+	align-items: center;
+	justify-content: center;
 }
 
 #fixed-bottom {

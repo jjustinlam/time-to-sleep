@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./overnight-sleep.page.scss'],
 })
 export class OvernightSleepPage implements OnInit {
-
+  
   constructor() { }
 
   ngOnInit() {
