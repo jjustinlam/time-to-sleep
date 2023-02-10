@@ -19,13 +19,21 @@ export class PersonalModelService {
     // TO DO
   }
 
+  private sort_course_list() {
+    PersonalModelService.courses.sort((a:Course, b:Course) => {
+      return a.course_name.localeCompare(b.course_name);
+    });
+  }
+
   public add_course(course:Course) {
     PersonalModelService.courses.push(course);
+    this.sort_course_list();
     // TO DO: Push course to database 
   }
 
   public remove_course(course:Course) {
-    PersonalModelService.courses.filter((elm) => elm !== course);
+    PersonalModelService.courses = PersonalModelService.courses.filter((elm) => { return elm !== course });
+    this.sort_course_list();
     // TO DO: Pop course from database
   }
 

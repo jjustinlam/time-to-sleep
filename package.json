@@ -28,6 +28,7 @@
     "@ionic/angular": "^6.1.9",
     "cordova-plugin-health": "^2.1.0",
     "ionicons": "^6.0.3",
+    "jquery": "^3.6.3",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
@@ -46,6 +47,7 @@
     "@ionic/angular-toolkit": "^6.0.0",
     "@ionic/lab": "3.2.15",
     "@types/jasmine": "~4.0.0",
+    "@types/jquery": "^3.5.16",
     "@types/node": "^12.11.1",
     "@typescript-eslint/eslint-plugin": "5.3.0",
     "@typescript-eslint/parser": "5.3.0",

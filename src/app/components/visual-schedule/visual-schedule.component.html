@@ -22,7 +22,7 @@
                     <p>{{course.course_name}}</p>
                   </ion-col>
                   <ion-col>
-                    <p>{{course.days}}</p>
+                    <p>{{course.days_str}}</p>
                   </ion-col>
                 </ion-row>
 
@@ -40,7 +40,10 @@
         </ion-item>
 
         <ion-item-options>
-          <ion-item-option id="item-option" (click)="remove_course(course)" class="bg-transparent">
+          <!-- <ion-item-option (click)="edit_course(course)" class="bg-transparent">
+            <ion-icon slot="icon-only" color="primary" name="pencil"></ion-icon>
+          </ion-item-option> -->
+          <ion-item-option (click)="remove_course(course)" class="bg-transparent">
             <ion-icon slot="icon-only" color="primary" name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
@@ -64,13 +67,13 @@
 </ion-card>
 
 <div id="fixed-bottom">
-  <ion-button id="open-new-entry-modal" expand="block">
+  <ion-button id="open-course-modal" expand="block">
     <ion-icon slot="start" name="add-outline"></ion-icon>
     <ion-label>Add a course</ion-label>
   </ion-button>
 </div>
 
-<ion-modal trigger="open-new-entry-modal" [initialBreakpoint]="0.9" [breakpoints]="[0, 0.9]" (onDismiss)="reset_modal()">
+<ion-modal id="course-modal" trigger="open-course-modal" [initialBreakpoint]="0.9" [breakpoints]="[0, 0.9]" (onDismiss)="reset_modal()">
   <ng-template>
     <ion-header>
       <ion-toolbar>

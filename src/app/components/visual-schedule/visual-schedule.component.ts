@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonModal } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 
 import { Course } from 'src/app/data/course';
 import { PersonalModelService } from 'src/app/services/personal-model.service';
@@ -20,7 +22,7 @@ export class VisualScheduleComponent implements OnInit {
   course_type = "";
   course_name = "";
 
-  constructor(private personal_model:PersonalModelService) {}
+  constructor(private personal_model:PersonalModelService, private alert_controller:AlertController, private modal_controller:ModalController) {}
 
   ngOnInit() {
     this.reset_modal();
@@ -45,9 +47,36 @@ export class VisualScheduleComponent implements OnInit {
     );
   }
 
-  remove_course(course:Course) {
-    this.personal_model.remove_course(course);
+  async remove_course(course:Course) {
+    const alert = await this.alert_controller.create({
+      header: 'Remove this course?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Confirm',
+          role: 'delete'
+        }
+      ],
+    });
+
+    await alert.present();
+    const { role } = await alert.onDidDismiss();
+    if (role == 'delete') this.personal_model.remove_course(course);
   }
+
+  // async edit_course(course:Course) {
+  //   this.selected_days = course.days_as_bool_array();
+  //   this.time_start = course.time_start;
+  //   this.time_end = course.time_end;
+  //   this.course_type = course.course_type;
+  //   this.course_name = course.course_name;
+
+  //   this.personal_model.remove_course(course); // Remove the course and re-add it LOL
+  //   this.modal.present();
+  // }
 
   reset_modal() {
     this.selected_days = [false, false, false, false, false, false, false];
@@ -85,10 +114,10 @@ export class VisualScheduleComponent implements OnInit {
       // TO DO
       this.add_course();
       this.modal.dismiss();
+      this.reset_modal();
     } else {
       // present alert about invalid end time
     }
-    this.reset_modal();
   }
 
 }

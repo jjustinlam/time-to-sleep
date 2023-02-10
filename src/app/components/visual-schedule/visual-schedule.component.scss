@@ -33,6 +33,11 @@ ion-datetime {
 	width: 100%;
 }
 
+ion-item-option {
+	--color: white;
+	padding-right: 10px;
+}
+
 .ion-page {
 	display: flex;
 	text-align: center;
