@@ -19,7 +19,7 @@
               <ion-grid [fixed]="true">
                 <ion-row>
                   <ion-col>
-                    <p>{{course.course_name}}</p>
+                    <p>{{course.name}} {{course.type}}</p>
                   </ion-col>
                   <ion-col>
                     <p>{{course.days_str}}</p>
@@ -28,7 +28,7 @@
 
                 <ion-row>
                   <ion-col>
-                    <p>{{course.course_type}}</p>
+                    <p>{{course.format}}</p>
                   </ion-col>
                   <ion-col>
                     <p>{{course.time_start_str()}} - {{course.time_end_str()}}</p>
@@ -105,10 +105,24 @@
         </ion-row>
       </ion-grid>
 
-      <ion-item fill="solid" class="ion-padding">
-        <ion-label position="floating">Course</ion-label>
-        <ion-input placeholder="Enter course name" [(ngModel)]="course_name"></ion-input>
-      </ion-item>
+      <ion-grid class="ion-padding">
+        <ion-row>
+          <ion-col>
+            <ion-item fill="solid">
+              <ion-label position="floating">Course</ion-label>
+              <ion-input placeholder="Enter course name" [(ngModel)]="course_name"></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item fill="solid">
+              <ion-select interface="action-sheet" placeholder="Lec" [(ngModel)]="course_format">
+                <ion-select-option *ngFor="let type of course_types">{{type}}</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      
 
       <ion-grid>
         <ion-row>
@@ -144,7 +158,7 @@
 
       <ion-list>
         <ion-item>
-          <ion-select interface="action-sheet" placeholder="Select course type" [(ngModel)]="course_type">
+          <ion-select interface="action-sheet" placeholder="Select course format" [(ngModel)]="course_format">
             <ion-select-option value="In person">In person</ion-select-option>
             <ion-select-option value="Syncronous remote">Syncronous remote</ion-select-option>
             <ion-select-option value="Asynchronous remote">Asyncronous remote</ion-select-option>

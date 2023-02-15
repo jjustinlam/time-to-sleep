@@ -1,21 +1,24 @@
 export class Course {
-	course_name:string;
-	course_type:string;
-	private days:Array<boolean>;
+	name:string;
+	type:string = "Lec";
+	format:string;
+	days:Array<boolean>;
 	time_start:Date;
 	time_end:Date;
 
-	private static days_strings = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+	static days_strings = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+	static course_types = ['Act', 'Col', 'Dis', 'Fld', 'Lab', 'Lec', 'Qiz', 'Res', 'Sem', 'Stu', 'Tap', 'Tut'];
 
-	constructor(course_name:string, course_type:string, selected_days:Array<boolean>, time_start:Date, time_end:Date) {
-		this.course_name = course_name;
-		this.course_type = course_type;
+	constructor(name:string, type:string, format:string, selected_days:Array<boolean>, time_start:Date, time_end:Date) {
+		this.name = name;
+		this.type = type;
+		this.format = format;
 		this.days = selected_days;
 		this.time_start = time_start;
 		this.time_end = time_end;
 	}
 
-	get days_str() {
+	get days_str() : string {
 		var arr = [];
 		for (var i = 0; i < this.days.length; i++) {
 			if (this.days[i]) arr.push(Course.days_strings[i]);

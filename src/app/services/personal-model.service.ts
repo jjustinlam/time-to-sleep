@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Course } from '../data/course';
+import { SQLiteService } from './sqlite.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ export class PersonalModelService {
   private static loadDefaultData:boolean = false;
   public static courses:Course[] = [];
 
-  constructor() { 
+  constructor(private sqlite:SQLiteService) { 
     if (PersonalModelService.loadDefaultData) {
       this.load_default_data();
     }
@@ -21,7 +22,7 @@ export class PersonalModelService {
 
   private sort_course_list() {
     PersonalModelService.courses.sort((a:Course, b:Course) => {
-      return a.course_name.localeCompare(b.course_name);
+      return a.name.localeCompare(b.name);
     });
   }
 

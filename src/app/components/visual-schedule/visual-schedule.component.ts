@@ -19,7 +19,8 @@ export class VisualScheduleComponent implements OnInit {
   selected_days = [false, false, false, false, false, false, false]; // selected_days[0] is Sunday
   time_start = new Date();
   time_end = new Date();
-  course_type = "";
+  course_type = "Lec";
+  course_format = "";
   course_name = "";
 
   constructor(private personal_model:PersonalModelService, private alert_controller:AlertController, private modal_controller:ModalController) {}
@@ -33,6 +34,10 @@ export class VisualScheduleComponent implements OnInit {
     return PersonalModelService.courses;
   }
 
+  get course_types() {
+    return Course.course_types;
+  }
+
   show_study_list() {
     this.display = "study-list";
   }
@@ -43,7 +48,7 @@ export class VisualScheduleComponent implements OnInit {
 
   add_course() {
     this.personal_model.add_course(
-      new Course(this.course_name, this.course_type, this.selected_days, this.time_start, this.time_end)
+      new Course(this.course_name, this.course_type, this.course_format, this.selected_days, this.time_start, this.time_end)
     );
   }
 
@@ -71,7 +76,7 @@ export class VisualScheduleComponent implements OnInit {
   //   this.selected_days = course.days_as_bool_array();
   //   this.time_start = course.time_start;
   //   this.time_end = course.time_end;
-  //   this.course_type = course.course_type;
+  //   this.course_format = course.course_format;
   //   this.course_name = course.course_name;
 
   //   this.personal_model.remove_course(course); // Remove the course and re-add it LOL
@@ -84,7 +89,7 @@ export class VisualScheduleComponent implements OnInit {
     this.time_start.setMinutes(0);
     this.time_end.setHours(8);
     this.time_end.setMinutes(50);
-    this.course_type = "";
+    this.course_format = "";
     this.course_name = "";
   }
 
@@ -106,7 +111,7 @@ export class VisualScheduleComponent implements OnInit {
   }
 
   is_valid() {
-    return (this.duration() > 0) && (this.course_type.length > 0) && (this.course_name.length > 0) && this.selected_days.some((elm) => elm);
+    return (this.duration() > 0) && (this.course_format.length > 0) && (this.course_name.length > 0) && this.selected_days.some((elm) => elm);
   }
 
   confirm() {
