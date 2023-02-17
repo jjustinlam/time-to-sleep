@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
+import { SwiperModule } from 'swiper/angular';
 
-import { MySchedulePageRoutingModule } from './my-schedule-routing.module';
+import { SetupPageRoutingModule } from './setup-routing.module';
 
-import { MySchedulePage } from './my-schedule.page';
+import { SetupPage } from './setup.page';
 
+// import { VisualScheduleComponent } from 'src/app/components/visual-schedule/visual-schedule.component';
 import { VisualScheduleModule } from 'src/app/components/visual-schedule/visual-schedule.module';
 
 @NgModule({
@@ -15,13 +17,14 @@ import { VisualScheduleModule } from 'src/app/components/visual-schedule/visual-
     CommonModule,
     FormsModule,
     IonicModule,
-    MySchedulePageRoutingModule,
+    SetupPageRoutingModule,
+    SwiperModule,
     VisualScheduleModule
   ],
   declarations: [
-    MySchedulePage,
+    SetupPage,
     // VisualScheduleComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class MySchedulePageModule {}
+export class SetupPageModule {}

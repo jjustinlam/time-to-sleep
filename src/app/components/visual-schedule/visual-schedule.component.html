@@ -74,7 +74,7 @@
 </div>
 
 <ion-modal trigger="open-course-modal" [initialBreakpoint]="0.9" [breakpoints]="[0, 0.9]" (onDismiss)="reset_modal()">
-  <ng-template>
+  <ng-template id="2">
     <ion-header>
       <ion-toolbar>
         <ion-button id="confirm" (click)="confirm()" slot="end" [color]="(is_valid()) ? 'success' : 'danger'">

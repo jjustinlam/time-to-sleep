@@ -4,8 +4,9 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'pages/my-schedule',
-    pathMatch: 'full'
+    redirectTo: 'pages/setup',
+    // redirectTo: 'pages/my-schedule',
+    pathMatch: 'full',
   },
   // {
   //   path: 'folder/:id',
@@ -26,7 +27,12 @@ const routes: Routes = [
   {
     path: 'pages/settings',
     loadChildren: () => import('./pages/settings/settings.module').then( m => m.SettingsPageModule)
-  }
+  },
+  {
+    path: 'pages/setup',
+    loadChildren: () => import('./pages/setup/setup.module').then( m => m.SetupPageModule)
+  },
+
 ];
 
 @NgModule({

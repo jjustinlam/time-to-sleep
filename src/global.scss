@@ -25,6 +25,10 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
+// global.scss
+@import 'swiper/scss';
+@import '@ionic/angular/css/ionic-swiper';
+
 /* How do you center a div? */
 #container {
 	text-align: center;
@@ -35,6 +39,22 @@
 	// transform: translateY(-50%);
 }
 
+// .swiper-slide {
+// 	align-items: center;
+// 	display: block;
+// }
+
+#fullscreen-container {
+	height: 100%;
+	text-align: center;
+	position: absolute;
+	display: block;
+	left: 0;
+	right: 0;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
 .row {
 	display: flex;
 	text-align: center;
@@ -43,11 +63,13 @@
 }
 
 #fixed-bottom {
+	z-index: 100;
 	position: fixed;
+	// position: absolute;
 	text-align: center;
 	left: 50%;
-	transform: translate(-50%, -50%);
-	bottom: 25px;
+	transform: translateX(-50%);
+	bottom: 15%;
 }
 
 .action-sheet-group {

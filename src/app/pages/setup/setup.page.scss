@@ -1,0 +1,29 @@
+#toolbar {
+	--background: var(--ion-background-color);
+}
+
+#advance-button {
+	z-index: 100;
+	position: fixed;
+	text-align: center;
+	right: 5%;
+	// left: 50%;
+	// transform: translate(-50%, -50%);
+	bottom: 5%;
+}
+
+.swiper {
+	height: 100%;
+}
+
+.swiper-slide {
+	display: block;
+	top: 10%;
+}
+
+#splash {
+	text-align: center;
+	padding: 20px;
+	top: 50%;
+	transform: translateY(-25%);
+}
