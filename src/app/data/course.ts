@@ -6,7 +6,7 @@ export class Course {
 	time_start:Date;
 	time_end:Date;
 
-	static days_strings = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+	static day_labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	static course_types = ['Act', 'Col', 'Dis', 'Fld', 'Lab', 'Lec', 'Qiz', 'Res', 'Sem', 'Stu', 'Tap', 'Tut'];
 
 	constructor(name:string, type:string, format:string, selected_days:Array<boolean>, time_start:Date, time_end:Date) {
@@ -21,7 +21,7 @@ export class Course {
 	get days_str() : string {
 		var arr = [];
 		for (var i = 0; i < this.days.length; i++) {
-			if (this.days[i]) arr.push(Course.days_strings[i]);
+			if (this.days[i]) arr.push(Course.day_labels[i]);
 		}
 		return arr.join(' ');
 	}

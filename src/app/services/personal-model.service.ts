@@ -11,7 +11,18 @@ export class PersonalModelService {
   public static courses:Course[] = [];
 
   constructor(private sqlite:SQLiteService) { 
+    this.set_default_preferences();
+    if (PersonalModelService.loadDefaultData) {
+      this.load_default_data();
+    }
+    // PersonalModelService.loadDefaultData = false;
+  }
 
+  load_default_data() {
+    // TO DO
+  }
+
+  set_default_preferences() {
     if (!Preferences.get({key: 'has_setup'})) Preferences.set({key: 'has_setup', value: 'false'});
     // Morning or night person
     if (!Preferences.get({key: 'prefers_morning'})) Preferences.set({key: 'prefers_morning', value: 'false'});
@@ -36,30 +47,29 @@ export class PersonalModelService {
     if (!Preferences.get({key: 'thu'}))Preferences.set({key: 'thu', value: '11:00 PM, 7:00 AM'});
     if (!Preferences.get({key: 'fri'}))Preferences.set({key: 'fri', value: '11:00 PM, 7:00 AM'});
     if (!Preferences.get({key: 'sat'}))Preferences.set({key: 'sat', value: '11:00 PM, 7:00 AM'});
-
-    if (PersonalModelService.loadDefaultData) {
-      this.load_default_data();
-    }
-    PersonalModelService.loadDefaultData = false;
   }
 
-  private load_default_data() {
-    // TO DO
+  erase_data() {
+    Preferences.clear();
+    this.set_default_preferences();
+    PersonalModelService.courses = [];
+    this.sqlite.drop_tables();
+    if (PersonalModelService.loadDefaultData) this.load_default_data();
   }
 
-  private sort_course_list() {
+  sort_course_list() {
     PersonalModelService.courses.sort((a:Course, b:Course) => {
       return a.name.localeCompare(b.name);
     });
   }
 
-  public add_course(course:Course) {
+  add_course(course:Course) {
     PersonalModelService.courses.push(course);
     this.sort_course_list();
     // TO DO: Push course to database 
   }
 
-  public remove_course(course:Course) {
+  remove_course(course:Course) {
     PersonalModelService.courses = PersonalModelService.courses.filter((elm) => { return elm !== course });
     this.sort_course_list();
     // TO DO: Pop course from database

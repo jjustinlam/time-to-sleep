@@ -24,21 +24,38 @@ export class SQLiteService {
         location: 'default'
       }).then((db:SQLiteObject) => {
         this.db = db;
+        this.native = true;
       });
     } catch (e) {
       console.log('Your device does not support SQLite natively');
     }
   }
 
-  initSleepiness() {
-    this.db.executeSql(`
-      CREATE TABLE Sleepiness(
-        day DATETIME, 
-        score INTEGER,
+  drop_tables() {
+    if (this.native) {
+      this.db.executeSql(`
+        DROP TABLE Course;
+        DROP TABLE Sleepiness;
+        DROP TABLE OvernightSleep;
+      `).catch((e) => {
+        console.log(e);
+      });
+    }
+  }
 
-        PRIMARY KEY (day)
-      )
-    `)
+  initSleepiness() {
+    if (this.native) {
+      this.db.executeSql(`
+        CREATE TABLE Sleepiness(
+          day DATETIME, 
+          score INTEGER,
+
+          PRIMARY KEY (day)
+        )
+      `).catch((e) => {
+        console.log(e);
+      });
+    }
   }
 
   // avgSleepiness(day:Date) {
@@ -50,73 +67,84 @@ export class SQLiteService {
   // }
 
   initOvernightSleepiness() {
-    this.db.executeSql(`
-      CREATE TABLE OvernightSleep(
-        timeStart DATETIME,
-        timeEnd DATETIME,
+    if (this.native) {
+      this.db.executeSql(`
+        CREATE TABLE OvernightSleep(
+          timeStart DATETIME,
+          timeEnd DATETIME,
 
-        PRIMARY KEY (timeStart)
-      )
-    `)
+          PRIMARY KEY (timeStart)
+        )
+      `).catch((e) => {
+        console.log(e);
+      });
+    }
   }
 
   initCourses() {
-    // this.db.executeSql('CREATE TABLE Course(name:VARCHAR(32), type:VARCHAR(32), days:CHAR(7), time_start:DATE, time_end:DATE)')
-    this.db.executeSql(`
-      CREATE TABLE Course(
-        name VARCHAR(32),
-        type VARCHAR(32),
-        format VARCHAR(32),
-        days CHAR(7),
-        time_start DATETIME,
-        time_end DATETIME,
+    if (this.native) {
+      this.db.executeSql(`
+        CREATE TABLE Course(
+          name VARCHAR(32),
+          type VARCHAR(32),
+          format VARCHAR(32),
+          days CHAR(7),
+          time_start DATETIME,
+          time_end DATETIME,
 
-        PRIMARY KEY (name, type)
-      )
-    `);
+          PRIMARY KEY (name, type)
+        )
+      `).catch((e) => {
+        console.log(e);
+      });
+    }
   }
 
   insertCourse(course:Course) {
-    var days = course.days.map((elm) => {
-      if (elm) return "1";
-      else return "0";
-    }).join('');
-    this.db.executeSql(`
-      INSERT INTO Course C
-      VALUES (
-        ${course.name}, 
-        ${course.type},
-        ${course.format},
-        ${days},
-        ${course.time_start},
-        ${course.time_end}
-      )
-    `)
+    if (this.native) {
+      var days = course.days.map((elm) => {
+        if (elm) return "1";
+        else return "0";
+      }).join('');
+      this.db.executeSql(`
+        INSERT INTO Course C
+        VALUES ( ${course.name}, ${course.type}, ${course.format}, ${days}, ${course.time_start}, ${course.time_end} )
+      `).catch((e) => {
+        console.log(e);
+      });
+    }
   }
 
   removeCourse(course:Course) {
-    this.db.executeSql(`
-      DELETE FROM Course C
-      WHERE C.name = ${course.name} AND C.type = ${course.type}
-    `)
+    if (this.native) {
+      this.db.executeSql(`
+        DELETE FROM Course C
+        WHERE C.name = ${course.name} AND C.type = ${course.type}
+      `).catch((e) => {
+        console.log(e);
+      });
+    }
   }
   
   retrieveCoursesByDay(day:string) : Array<Course> {
-    var index = Course.days_strings.indexOf(day);
+    var index = Course.day_labels.indexOf(day);
     var out:Array<Course> = [];
-
-    if (index >= 0) {
-      var arr = new Array(7).fill("0");
-      arr[index] = "1";
-      this.db.executeSql(`
-        SELECT C.name, C.time_start, C.time_end
-        FROM Course C
-        WHERE C.days = ${arr.join('')}
-      `).then((courses: Array<Course>) => {
-        out = courses;
-      })
+    if (this.native) {
+      if (index >= 0) {
+        var arr = new Array(7).fill("0");
+        arr[index] = "1";
+        this.db.executeSql(`
+          SELECT C.name, C.time_start, C.time_end
+          FROM Course C
+          WHERE C.days = ${arr.join('')}
+        `).then((courses: Array<Course>) => {
+          out = courses;
+        }).catch((e) => {
+          console.log(e);
+        });
+      }
     }
     return out;
-  }
+  } 
 
 }

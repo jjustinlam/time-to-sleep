@@ -11,17 +11,18 @@ import { Preferences } from '@capacitor/preferences';
 })
 export class SetupPage implements OnInit {
   page:number = 0;
+  size:number = 5;
   swiper:Swiper;
 
   isEnd:boolean = false;
 
   prefers_morning:boolean;
+  wind_up_time:Date;
+  fitness_connected:boolean = false;
 
   constructor() { }
 
   async ngOnInit() {
-    Preferences.clear(); // temporary
-
     const { value } = await Preferences.get({key: 'has_setup'});
     if (!value || value == 'false') {
       Preferences.set({key: 'has_setup', value: 'false'});
@@ -40,6 +41,7 @@ export class SetupPage implements OnInit {
       window.location.href = '/pages/my-schedule';
     } else {
       if (this.page == 1 && this.prefers_morning === undefined) return;
+      else if (this.page == 3 && this.wind_up_time === undefined) return;
       
       this.swiper.slideNext();
       this.page++;
@@ -60,6 +62,10 @@ export class SetupPage implements OnInit {
   }
   set_prefers_night() {
     this.prefers_morning = false;
+  }
+
+  connect_fitness() {
+    // TO DO: fitness integration
   }
 
 }

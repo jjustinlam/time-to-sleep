@@ -31,4 +31,26 @@
       </ion-item>
     </ion-card-content>
   </ion-card>
+
+  <h1>Advanced</h1>
+  <ion-card>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>Add static data</ion-label>
+        <ion-button slot="end">
+          <ion-icon name="clipboard"></ion-icon> <!-- TO DO: Integrate static data -->
+        </ion-button>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>Clear data</ion-label>
+        <ion-button (click)="clear_data()" slot="end">
+          <ion-icon name="nuclear"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

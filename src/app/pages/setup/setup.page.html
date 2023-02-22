@@ -44,18 +44,25 @@
       </div>
 
       <div class="swiper-slide">
-        <!-- TO DO -->
-        How much time do you need to prepare/commute to get to campus?
+        <h1><strong>How much time do you need to prepare/commute before getting to campus?</strong></h1>
+        <ion-datetime presentation="time" [(ngModel)]="wind_up_time" minuteValues="0,10,20,30,40,50"></ion-datetime>
       </div>
 
       <div class="swiper-slide">
-        <!-- TO DO -->
-        Would you like to connect your fitness app?
+        <h1><strong>Would you like to connect your fitness app?</strong></h1>
+        <h2>We will use sleep data to make better sleep time recommendations</h2>
+        <ion-item>
+          <ion-label>Connect and use your fitness data</ion-label>
+          <ion-toggle slot="end" [(ngModel)]="fitness_connected" (click)="connect_fitness()"></ion-toggle>
+        </ion-item>
       </div>
 
       <div class="swiper-slide">
-        <!-- TO DO -->
-        You're all set!
+        <h1><strong>You're all set!</strong></h1>
+        <ion-button (click)="advance()" color="secondary" shape="round">
+          <ion-label>Start using</ion-label>
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
       </div>
     </div>
 
@@ -70,10 +77,10 @@
     <div class="swiper-scrollbar"></div>    
   </div>
 
-  <div id="advance-button">
+  <div *ngIf="!isEnd" id="advance-button">
     <ion-button (click)="advance()" color="secondary" shape="round">
-      <ion-icon *ngIf="!isEnd" slot="icon-only" name="arrow-forward-circle"></ion-icon>
-      <ion-icon *ngIf="isEnd" slot="icon-only" name="checkmark-circle"></ion-icon>
+      <ion-icon slot="icon-only" name="arrow-forward-circle"></ion-icon>
+      <!-- <ion-icon *ngIf="isEnd" slot="icon-only" name="checkmark-circle"></ion-icon> -->
     </ion-button>
   </div>
 </ion-content>
