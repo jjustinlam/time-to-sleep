@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, SkipSelf, ViewChild } from '@angular/core';
 import { IonModal } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
 import { ModalController } from '@ionic/angular';
@@ -8,6 +8,7 @@ import { PersonalModelService } from 'src/app/services/personal-model.service';
 
 @Component({
   selector: 'app-visual-schedule',
+  providers: [PersonalModelService],
   templateUrl: './visual-schedule.component.html',
   styleUrls: ['./visual-schedule.component.scss'],
 })

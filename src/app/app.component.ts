@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { Preferences } from '@capacitor/preferences';
+// import { Preferences } from '@capacitor/preferences';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +8,7 @@ import { Preferences } from '@capacitor/preferences';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  show_menu:boolean = false; 
+  // show_menu:boolean = true; 
   // show_menu:boolean= true; // TO DO: Change to make menu available ONLY AFTER setup process
 
   public appPages = [
@@ -22,8 +22,8 @@ export class AppComponent {
     // TO DO: Retrieve from database if the user has setup yet. If retrieved is true, set this.has_setup to true.
   }
 
-  async ngOnInit() {
-    const { value } = await Preferences.get({key: 'has_setup'});
-    if (value == 'true') this.show_menu = true;
+  ngOnInit() {
+    // const { value } = await Preferences.get({key: 'has_setup'});
+    // if (value == 'true') this.show_menu = true;
   }
 }

@@ -12,8 +12,8 @@
   <ion-card>
     <ion-card-content id="alarm-card">
       <p>We set an alarm for</p>
-      <h1><strong>8:00 AM</strong></h1> <!-- TO DO: Change to tomorrow's recommended alarm time OR user's overriden alarm time (if applicable)-->
-      <p>(in 12 hours)</p>
+      <h1><strong>{{wakeup_time_str}}</strong></h1> <!-- TO DO: Change to tomorrow's recommended alarm time OR user's overriden alarm time (if applicable)-->
+      <p>({{time_from_now}})</p>
       <ion-button slot="end"> <!-- TO DO: (click)="set_manual_alarm()" -->
         <ion-icon slot="start" name="pencil"></ion-icon>
         <ion-label>Set manually</ion-label>

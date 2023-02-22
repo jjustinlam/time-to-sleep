@@ -45,7 +45,10 @@
 
       <div class="swiper-slide">
         <h1><strong>How much time do you need to prepare/commute before getting to campus?</strong></h1>
-        <ion-datetime presentation="time" [(ngModel)]="wind_up_time" minuteValues="0,10,20,30,40,50"></ion-datetime>
+        <!-- <ion-datetime presentation="time" [(ngModel)]="wind_up_time" minuteValues="0,10,20,30,40,50"></ion-datetime> -->
+        <ion-button (click)="open_wind_up_picker()">
+          <ion-label>{{wind_up_string}}</ion-label>
+        </ion-button>
       </div>
 
       <div class="swiper-slide">
