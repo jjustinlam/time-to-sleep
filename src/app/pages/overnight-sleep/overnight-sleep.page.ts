@@ -21,8 +21,8 @@ export class OvernightSleepPage implements OnInit {
     var recommended = await this.personal_model.today(weekdays[date.getDay()]);
 
     date.setDate(date.getDate() + 1);
-    date.setHours(recommended.sleep.hour);
-    date.setMinutes(recommended.sleep.min);
+    date.setHours(recommended.wakeup.hour);
+    date.setMinutes(recommended.wakeup.min);
     return date;
   }
 
@@ -32,8 +32,8 @@ export class OvernightSleepPage implements OnInit {
     var recommended = await this.personal_model.today(weekdays[date.getDay()]);
 
     date.setDate(date.getDate() + 1);
-    date.setHours(recommended.wakeup.hour);
-    date.setMinutes(recommended.wakeup.min);
+    date.setHours(recommended.sleep.hour);
+    date.setMinutes(recommended.sleep.min);
     return date;
   }
 
