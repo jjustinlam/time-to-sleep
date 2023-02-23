@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PersonalModelService } from 'src/app/services/personal-model.service';
+import { Health } from '@awesome-cordova-plugins/health/ngx';
 
 @Component({
   selector: 'app-overnight-sleep',
@@ -8,8 +9,36 @@ import { PersonalModelService } from 'src/app/services/personal-model.service';
 })
 export class OvernightSleepPage implements OnInit {
   wakeup_time:Date = new Date();
+  sleep:string = "Error retrieving sleep data"; // placeholder text if unable to retrieve health data
 
-  constructor(private personal_model:PersonalModelService) { }
+  constructor(private personal_model:PersonalModelService, private health: Health)  {
+    this.health.isAvailable().then((available:boolean) => {
+      console.log(available);
+      this.health.requestAuthorization([
+        {
+        read: ['sleep']     //read only permission
+        }
+      ])
+      .then(res => console.log(res))
+      .catch(e => console.log(e));
+      this.loadSleep(); // set new sleep value from health data
+    })
+    .catch(e => console.log(e));
+
+ }
+
+  loadSleep(){
+    this.health.query({
+      startDate: new Date(new Date().getTime() - 24*60*60*1000), // past 24 hrs
+      endDate: new Date(), // now
+      dataType: 'sleep',
+      limit: 100
+    }).then(data => {
+      let sleepData = data[0].value; // TODO: need to fix how sleep data is actually retrieved
+      this.sleep = sleepData;
+    })
+  }
+
 
   async ngOnInit() {
     this.wakeup_time = await this.recommended_wakeup_time();

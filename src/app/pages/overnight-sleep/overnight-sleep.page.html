@@ -24,7 +24,9 @@
   <h1>Your sleep last night</h1>
   <ion-card>
     <ion-card-content>
-      <ion-label>7 hours 15 mintues</ion-label> <!-- TO DO: Change to yesterday's sleep length -->
+      <!-- TO DO: Change to yesterday's sleep length  -->
+      <!-- has a default error message, need to fix sleep data retrieval -->
+      <ion-label> {{ sleep }} </ion-label>
       <ion-icon slot="end" name="arrow-forward"></ion-icon>
     </ion-card-content>
   </ion-card>
