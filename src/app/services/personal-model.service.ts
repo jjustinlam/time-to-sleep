@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Course } from '../data/course';
 import { SQLiteService } from './sqlite.service';
 import { Preferences } from '@capacitor/preferences';
+import { AppComponent } from '../app.component';
 
 @Injectable({
   providedIn: 'root'
@@ -153,6 +154,7 @@ export class PersonalModelService {
     Preferences.clear();
     this.set_default_preferences();
     PersonalModelService.courses = [];
+    AppComponent.active = false;
     this.sqlite.drop_tables();
     if (PersonalModelService.loadDefaultData) this.load_default_data();
   }

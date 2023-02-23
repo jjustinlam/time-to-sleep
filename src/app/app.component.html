@@ -1,6 +1,6 @@
 <ion-app>
   <ion-split-pane contentId="main-content">
-    <ion-menu contentId="main-content" type="overlay">
+    <ion-menu *ngIf='show_menu' contentId="main-content" type="overlay">
       <ion-content>
         <ion-list id="pages-list">
           <ion-list-header class="ion-padding">Time to Sleep</ion-list-header>

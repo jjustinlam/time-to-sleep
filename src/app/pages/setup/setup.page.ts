@@ -6,6 +6,7 @@ import { Preferences } from '@capacitor/preferences';
 import { PersonalModelService } from 'src/app/services/personal-model.service';
 import { Router } from '@angular/router';
 import { PickerController } from '@ionic/angular';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-setup',
@@ -51,6 +52,7 @@ export class SetupPage implements OnInit {
   advance() {
     if (this.swiper.isEnd) {
       Preferences.set({key: 'has_setup', value: 'true'});
+      AppComponent.active = true;
       // window.location.href = '/pages/my-schedule';
       this.router.navigateByUrl('pages/my-schedule');
     } else {
