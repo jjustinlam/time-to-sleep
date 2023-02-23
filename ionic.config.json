@@ -1,7 +1,8 @@
 {
   "name": "Time to Sleep",
   "integrations": {
-    "capacitor": {}
+    "capacitor": {},
+    "cordova": {}
   },
   "type": "angular"
 }

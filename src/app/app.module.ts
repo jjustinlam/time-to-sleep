@@ -10,13 +10,19 @@ import { AppRoutingModule } from './app-routing.module';
 
 // import { VisualScheduleComponent } from './components/visual-schedule/visual-schedule.component';
 
+import { Health } from '@awesome-cordova-plugins/health/ngx';
+
+
 @NgModule({
   declarations: [
     AppComponent,
     // VisualScheduleComponent
   ],
   imports: [BrowserModule, FormsModule, IonicModule.forRoot(), AppRoutingModule],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    Health
+],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
