@@ -105,10 +105,22 @@
         <variable name="PLAY_AUTH_VERSION" value="19.0.0" />
         <variable name="FIT_API_VERSION" value="20.0.0" />
     </plugin>
-    <config-file parent="NSHealthShareUsageDescription" platform="ios">
-        <string>App needs read access</string>
+    <!-- Health plugin -->
+    <plugin name="cordova-plugin-health" source="npm">
+    <variable name="HEALTH_READ_PERMISSION" value="App needs read access"/>
+    <variable name="HEALTH_WRITE_PERMISSION" value="App needs write access"/>
+    <variable name="PLAY_AUTH_VERSION" value="19.0.0"/>
+    <variable name="FIT_API_VERSION" value="20.0.0"/>
+    </plugin>
+
+    <!-- Only if iOS -->
+
+    <!-- Read access -->
+    <config-file platform="ios" parent="NSHealthShareUsageDescription">
+    <string>App needs read access</string>
     </config-file>
-    <config-file parent="NSHealthUpdateUsageDescription" platform="ios">
-        <string>App needs write access</string>
+    <!-- Write access -->
+    <config-file platform="ios" parent="NSHealthUpdateUsageDescription">
+    <string>App needs write access</string>
     </config-file>
 </widget>

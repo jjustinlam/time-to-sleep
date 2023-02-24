@@ -7,35 +7,59 @@ import { Health } from '@awesome-cordova-plugins/health/ngx';
   templateUrl: './overnight-sleep.page.html',
   styleUrls: ['./overnight-sleep.page.scss'],
 })
-export class OvernightSleepPage implements OnInit {
-  wakeup_time:Date = new Date();
-  sleep:string = "Error retrieving sleep data"; // placeholder text if unable to retrieve health data
 
-  constructor(private personal_model:PersonalModelService, private health: Health)  {
-    this.health.isAvailable().then((available:boolean) => {
+
+export class OvernightSleepPage implements OnInit {
+  wakeup_time: Date = new Date();
+  sleep: string = "Error retrieving sleep data"; // placeholder text if unable to retrieve health data
+
+  constructor(private personal_model: PersonalModelService, private health: Health) {
+    this.health.isAvailable().then((available: boolean) => {
       console.log(available);
       this.health.requestAuthorization([
         {
-        read: ['sleep']     //read only permission
+          read: ['sleep']     //read only permission
         }
       ])
-      .then(res => console.log(res))
-      .catch(e => console.log(e));
-      this.loadSleep(); // set new sleep value from health data
+        .then(res => {
+          console.log(res);
+          this.loadSleep(); // set new sleep value from health data
+        })
+        .catch(e => console.log(e));
     })
-    .catch(e => console.log(e));
+      .catch(e => console.log(e));
 
- }
+  }
 
-  loadSleep(){
+  formatTime(ms: number): string {
+    const seconds = Math.floor(ms / 1000);
+    const hrs = Math.floor(seconds / 3600);
+    const min = Math.floor((seconds % 3600) / 60);
+
+    return `${hrs}hrs and ${min}min`;
+  }
+
+
+  loadSleep() {
     this.health.query({
-      startDate: new Date(new Date().getTime() - 24*60*60*1000), // past 24 hrs
+      startDate: new Date(new Date().getTime() - 24 * 60 * 60 * 1000), // past 24 hrs
       endDate: new Date(), // now
       dataType: 'sleep',
       limit: 100
     }).then(data => {
-      let sleepData = data[0].value; // TODO: need to fix how sleep data is actually retrieved
-      this.sleep = sleepData;
+
+      let sleepData = data.reduce((total, data) => {
+        if (["sleep", "sleep.light", "sleep.deep", "sleep.rem"].includes(data.value)) {
+          const sleepStart = new Date(data.startDate);
+          const sleepEnd = new Date(data.endDate);
+          const sleepDuration = sleepEnd.getTime() - sleepStart.getTime();
+          return total + sleepDuration;
+        }
+        return total;
+      }, 0); // TODO: need to fix how sleep data is actually retrieved
+
+      console.log(sleepData);
+      this.sleep = this.formatTime(sleepData);
     })
   }
 
@@ -67,14 +91,14 @@ export class OvernightSleepPage implements OnInit {
   }
 
   get wakeup_time_str() {
-    return new Date(this.wakeup_time).toLocaleTimeString('en-US', {timeStyle: 'short'});
+    return new Date(this.wakeup_time).toLocaleTimeString('en-US', { timeStyle: 'short' });
   }
 
   get time_from_now() {
     if (this.wakeup_time) {
       var diff = (new Date()).getDate() - this.wakeup_time.getDate();
       var hours = Math.floor(diff / (1000 * 60 * 60));
-      
+
       if (hours > 1) return `in ${hours} hours`;
       else if (hours > 0) return `in ${hours} hour`;
       else return `in <1 hour`;
