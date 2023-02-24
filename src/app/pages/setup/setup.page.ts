@@ -7,6 +7,8 @@ import { PersonalModelService } from 'src/app/services/personal-model.service';
 import { Router } from '@angular/router';
 import { PickerController } from '@ionic/angular';
 import { AppComponent } from 'src/app/app.component';
+import { Health } from '@awesome-cordova-plugins/health/ngx';
+
 
 @Component({
   selector: 'app-setup',
@@ -33,7 +35,7 @@ export class SetupPage implements OnInit {
     else return `${minutes} minutes`;
   }
 
-  constructor(private personal_model:PersonalModelService, private pickerController:PickerController, private router:Router) { }
+  constructor(private personal_model:PersonalModelService, private pickerController:PickerController, private router:Router, private health: Health) { }
 
   async ngOnInit() {
     const { value } = await Preferences.get({key: 'has_setup'});
@@ -131,7 +133,19 @@ export class SetupPage implements OnInit {
   }
 
   connect_fitness() {
-    // TO DO: fitness integration
+    this.health.isAvailable().then((available: boolean) => {
+      console.log(available);
+      this.health.requestAuthorization([
+        {
+          read: ['sleep']     //read only permission
+        }
+      ])
+        .then(res => {
+          console.log(res);
+        })
+        .catch(e => console.log(e));
+    })
+      .catch(e => console.log(e));
   }
 
 }
