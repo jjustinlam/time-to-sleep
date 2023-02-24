@@ -17,6 +17,7 @@ export class AppComponent {
     { title: 'My Schedule', url: '/pages/my-schedule', icon: 'calendar' },
     { title: 'Overnight Sleep', url: '/pages/overnight-sleep', icon: 'moon' },
     { title: 'Sleepiness', url: '/pages/sleepiness', icon: 'battery-charging' },
+    { title: 'Coffee', url: '/pages/coffee', icon: 'cafe'},
     { title: 'Settings', url: '/pages/settings', icon: 'cog' },
   ];
   // public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];

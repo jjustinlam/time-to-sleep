@@ -1,0 +1,31 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Coffee</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content id="container">
+  <h1>Need coffee?</h1>
+  <ion-button (click)="find_coffee_shop()">
+    <ion-icon slot="start" name="search-circle"></ion-icon>
+    <ion-label>Find me the nearest shop</ion-label>
+  </ion-button>
+
+  <ion-card *ngIf="found_shops">
+    <ion-card-header>
+      <ion-button (click)="back()" shape="round" slot="start" color="primary" class="ion-padding">
+        <ion-icon name="arrow-forward" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button (click)="forward()" shape="round" slot="start" color="primary" class="ion-padding">
+        <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-card-header>
+    <ion-card-content>
+      <!-- Found location goes here -->
+      <!-- If possible, Google Maps would be nice. Otherwise, name of the cafe, distance, and address? -->
+    </ion-card-content>
+  </ion-card>
+</ion-content>

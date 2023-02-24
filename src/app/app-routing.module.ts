@@ -32,6 +32,11 @@ const routes: Routes = [
     path: 'pages/setup',
     loadChildren: () => import('./pages/setup/setup.module').then( m => m.SetupPageModule)
   },
+  {
+    path: 'pages/coffee',
+    loadChildren: () => import('./pages/coffee/coffee.module').then( m => m.CoffeePageModule)
+  },
+
 
 ];
 
