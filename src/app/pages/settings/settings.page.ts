@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, PickerController } from '@ionic/angular';
 import { PersonalModelService } from 'src/app/services/personal-model.service';
+import { Health } from '@awesome-cordova-plugins/health/ngx';
+
 
 @Component({
   selector: 'app-settings',
@@ -11,7 +13,7 @@ import { PersonalModelService } from 'src/app/services/personal-model.service';
 export class SettingsPage implements OnInit {
   wind_up_time:number;
 
-  constructor(private personal_model: PersonalModelService, private alertController:AlertController, private pickerController:PickerController ,private router:Router) { }
+  constructor(private personal_model: PersonalModelService, private alertController:AlertController, private pickerController:PickerController, private router:Router, private health: Health) { }
 
   ngOnInit() {
     // TO DO: Retrieve wind up time ?
@@ -90,6 +92,22 @@ export class SettingsPage implements OnInit {
     });
 
     await picker.present();
+  }
+
+  connect_fitness() {
+    this.health.isAvailable().then((available: boolean) => {
+      console.log(available);
+      this.health.requestAuthorization([
+        {
+          read: ['sleep']     //read only permission
+        }
+      ])
+        .then(res => {
+          console.log(res);
+        })
+        .catch(e => console.log(e));
+    })
+      .catch(e => console.log(e));
   }
 
 }
