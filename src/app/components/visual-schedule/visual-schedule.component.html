@@ -1,4 +1,4 @@
-<ion-grid>
+<!-- <ion-grid>
   <ion-row>
     <ion-col><ion-button (click)="show_study_list()">
       <ion-label>Study List</ion-label>
@@ -7,9 +7,10 @@
       <ion-label>Calendar</ion-label>
     </ion-button></ion-col>
   </ion-row>
-</ion-grid>
+</ion-grid> -->
 
-<div *ngIf="display == 'study-list'">
+<!-- <div *ngIf="display == 'study-list'"> -->
+<div>
   <div *ngIf="courses.length > 0">
     <ion-list class="bg-transparent">
       <ion-item-sliding *ngFor="let course of courses" class="bg-transparent">
@@ -60,11 +61,11 @@
 
 </div>
 
-<ion-card *ngIf="display == 'calendar'">
+<!-- <ion-card *ngIf="display == 'calendar'">
   <ion-card-content>
     Calendar
   </ion-card-content>  
-</ion-card>
+</ion-card> -->
 
 <div id="fixed-bottom">
   <ion-button id="open-course-modal" expand="block">

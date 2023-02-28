@@ -10,7 +10,7 @@ import { Health } from '@awesome-cordova-plugins/health/ngx';
 
 
 export class OvernightSleepPage implements OnInit {
-  wakeup_time: Date = new Date();
+  wakeup_time:Date;
   sleep: string = "Error retrieving sleep data"; // placeholder text if unable to retrieve health data
 
   constructor(private personal_model: PersonalModelService, private health: Health) {
@@ -73,7 +73,15 @@ export class OvernightSleepPage implements OnInit {
     var date = new Date();
     var recommended = await this.personal_model.today(weekdays[date.getDay()]);
 
-    date.setDate(date.getDate() + 1);
+    var sleep = (recommended.sleep.hour) * 60 + (recommended.sleep.min);
+    var wakeup = (recommended.wakeup.hour) * 60 + (recommended.wakeup.min);
+
+    if (sleep > wakeup) {
+      // e.g. 23:00 - 8:00
+      date.setDate(date.getDate() + 1);
+    } else {
+      // e.g. 0:00 - 9:00, extreme case 1:00 - 1:00
+    }    
     date.setHours(recommended.wakeup.hour);
     date.setMinutes(recommended.wakeup.min);
     return date;
@@ -96,8 +104,11 @@ export class OvernightSleepPage implements OnInit {
 
   get time_from_now() {
     if (this.wakeup_time) {
-      var diff = (new Date()).getDate() - this.wakeup_time.getDate();
+      var now = new Date();
+
+      var diff = this.wakeup_time.valueOf() - now.valueOf();
       var hours = Math.floor(diff / (1000 * 60 * 60));
+      var minutes = Math.floor(diff / (1000* 60)) % 60;
 
       if (hours > 1) return `in ${hours} hours`;
       else if (hours > 0) return `in ${hours} hour`;

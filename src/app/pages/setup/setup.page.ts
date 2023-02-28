@@ -17,8 +17,9 @@ import { Health } from '@awesome-cordova-plugins/health/ngx';
   styleUrls: ['./setup.page.scss'],
 })
 export class SetupPage implements OnInit {
-  page:number = 0;
-  size:number = 5;
+  public static slides = ['welcome', 'morning/night', 'course schedule', 'prep/commute', 'fitness', 'finish'];
+  index:number = 0;
+  slide:string;
   swiper:Swiper;
 
   isEnd:boolean = false;
@@ -41,7 +42,8 @@ export class SetupPage implements OnInit {
     const { value } = await Preferences.get({key: 'has_setup'});
     if (!value || value == 'false') {
       this.personal_model.set_default_preferences();
-      this.page = 0;
+      this.index = 0;
+      this.slide = SetupPage.slides[this.index];
       this.swiper = new Swiper('.swiper', {
         allowTouchMove: false,
       });
@@ -54,25 +56,33 @@ export class SetupPage implements OnInit {
   advance() {
     if (this.swiper.isEnd) {
       Preferences.set({key: 'has_setup', value: 'true'});
+      Preferences.set({key: 'prefers_morning', value: `${this.prefers_morning}`});
+      for (var i = 0; i < PersonalModelService.day_labels.length; i++) {
+        // if user prefers night, shift all wakeup and sleep times by 2 hours (i.e. 1:00 - 9:00)
+        var day = PersonalModelService.day_labels[i];
+        this.personal_model.shift_sleep(day, 2*60);
+        this.personal_model.shift_wakeup(day, 2*60);
+      }
+      Preferences.set({key: 'wind_up_time', value: `${this.wind_up_time}`});
       AppComponent.active = true;
       // window.location.href = '/pages/my-schedule';
       this.router.navigateByUrl('pages/my-schedule');
     } else {
-      if (this.page == 1 && this.prefers_morning === undefined) return;
-      else if (this.page == 3 && this.wind_up_time === undefined) return;
+      if (this.slide == 'morning/night' && this.prefers_morning === undefined) return;
+      else if (this.slide == 'prep/commute' && this.wind_up_time === undefined) return;
       
       this.swiper.slideNext();
-      this.page++;
+      this.slide = SetupPage.slides[++this.index];
       this.isEnd = this.swiper.isEnd;
     }
   }
 
   back() {
     if (!this.swiper.isBeginning) {
-      this.page = Math.max(this.page - 1, 0);
+      this.slide = SetupPage.slides[--this.index];
       this.swiper.slidePrev();
       this.isEnd = this.swiper.isEnd;
-    }
+    } else this.index = 0;
   }
 
   async open_wind_up_picker() {

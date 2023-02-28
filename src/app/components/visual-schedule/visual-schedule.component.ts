@@ -15,7 +15,7 @@ import { PersonalModelService } from 'src/app/services/personal-model.service';
 export class VisualScheduleComponent implements OnInit {
   @ViewChild(IonModal) modal: IonModal;
 
-  display:string = "study-list";
+  // display:string = "study-list";
 
   selected_days = [false, false, false, false, false, false, false]; // selected_days[0] is Sunday
   time_start = new Date();
@@ -39,13 +39,13 @@ export class VisualScheduleComponent implements OnInit {
     return Course.course_types;
   }
 
-  show_study_list() {
-    this.display = "study-list";
-  }
+  // show_study_list() {
+  //   this.display = "study-list";
+  // }
 
-  show_calendar() {
-    this.display = "calendar";
-  }
+  // show_calendar() {
+  //   this.display = "calendar";
+  // }
 
   add_course() {
     this.personal_model.add_course(

@@ -14,7 +14,7 @@
     <ion-label>Find me the nearest shop</ion-label>
   </ion-button>
 
-  <ion-card *ngIf="found_shops">
+  <ion-card *ngIf="found_shops.length > 0">
     <ion-card-header>
       <ion-button (click)="back()" shape="round" slot="start" color="primary" class="ion-padding">
         <ion-icon name="arrow-forward" slot="icon-only"></ion-icon>
