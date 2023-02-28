@@ -2,8 +2,11 @@ import { Injectable } from '@angular/core';
 
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite';
 import { Platform } from '@ionic/angular';
+import { RSA_NO_PADDING } from 'constants';
 
 import { Course } from '../data/course';
+import { Sleep } from '../data/sleep';
+import { Sleepiness } from '../data/sleepiness';
 
 @Injectable({
   providedIn: 'root'
@@ -47,24 +50,45 @@ export class SQLiteService {
     if (this.native) {
       this.db.executeSql(`
         CREATE TABLE Sleepiness(
-          day DATETIME, 
+          date DATETIME, 
+          day CHAR(3),
           score INTEGER,
 
           PRIMARY KEY (day)
-        )
+        );
       `).catch((e) => {
         console.log(e);
       });
     }
   }
 
-  // avgSleepiness(day:Date) {
-  //   this.db.executeSql(`
-  //   SELECT AVG(S.score)
-  //   FROM Sleepiness S
-  //   WHERE S.day = ${day}
-  //   `)
-  // }
+  insertSleepiness(sleepiness:Sleepiness) {
+    if (this.native) {
+      // this.db.executeSql(`
+      // INSERT INTO Sleepiness
+      // VALUES ( ${sleepiness.date}, ${sleepiness.day}, ${sleepiness.rating} );
+      // `).catch((e) => {
+      //   console.log(e);
+      // });
+      this.db.executeSql('INSERT INTO Sleepiness VALUES (?)', [sleepiness.date, sleepiness.day, sleepiness.rating]);
+    }
+  }
+
+  getAverageSleepiness(day:string) {
+    if (this.native) {
+      this.db.executeSql(`
+        SELECT AVG(S.score) AS average
+        FROM Sleepiness S
+        WHERE S.day = ?
+      `, [day]
+      ).then(rs => {
+        return rs.rows.item(0).average;
+      }).catch((e) => {
+        console.log(e);
+      });
+    }
+    return -1;
+  }
 
   initOvernightSleepiness() {
     if (this.native) {
@@ -74,8 +98,17 @@ export class SQLiteService {
           timeEnd DATETIME,
 
           PRIMARY KEY (timeStart)
-        )
+        );
       `).catch((e) => {
+        console.log(e);
+      });
+    }
+  }
+
+  insertOvernightSleepiness(sleep:Sleep) {
+    if (this.native) {
+      this.db.executeSql('INSERT INTO OvernightSleep VALUES (?)', [sleep.time_sleep, sleep.time_wakeup])
+      .catch((e) => {
         console.log(e);
       });
     }
@@ -93,7 +126,7 @@ export class SQLiteService {
           time_end DATETIME,
 
           PRIMARY KEY (name, type)
-        )
+        );
       `).catch((e) => {
         console.log(e);
       });
@@ -108,8 +141,9 @@ export class SQLiteService {
       }).join('');
       this.db.executeSql(`
         INSERT INTO Course C
-        VALUES ( ${course.name}, ${course.type}, ${course.format}, ${days}, ${course.time_start}, ${course.time_end} )
-      `).catch((e) => {
+        VALUES (?);
+      `, [course.name, course.type, course.format, days, course.time_start, course.time_end])
+      .catch((e) => {
         console.log(e);
       });
     }
@@ -119,8 +153,9 @@ export class SQLiteService {
     if (this.native) {
       this.db.executeSql(`
         DELETE FROM Course C
-        WHERE C.name = ${course.name} AND C.type = ${course.type}
-      `).catch((e) => {
+        WHERE C.name = ? AND C.type = ?;
+      `, [course.name, course.type])
+      .catch((e) => {
         console.log(e);
       });
     }
@@ -128,7 +163,7 @@ export class SQLiteService {
   
   retrieveCoursesByDay(day:string) : Array<Course> {
     var index = Course.day_labels.indexOf(day);
-    var out:Array<Course> = [];
+    var courses:Array<Course> = [];
     if (this.native) {
       if (index >= 0) {
         var arr = new Array(7).fill("0");
@@ -136,15 +171,25 @@ export class SQLiteService {
         this.db.executeSql(`
           SELECT C.name, C.time_start, C.time_end
           FROM Course C
-          WHERE C.days = ${arr.join('')}
-        `).then((courses: Array<Course>) => {
-          out = courses;
-        }).catch((e) => {
+          WHERE C.days = ?
+        `, [arr.join('')])
+        .then((result) => {
+          for (var i = 0; i < result.rows.length; i++) {
+            var entry = result.rows.item(i);
+            var days = [];
+            for (var j = 0; j < entry.days.length; j++) {
+              if (entry.days[j] === '1') days.push(true);
+              else days.push(false);
+            }
+            courses.push(new Course(entry.name, entry.type, entry.format, days, entry.time_start, entry.time_end));
+          }
+        })
+        .catch((e) => {
           console.log(e);
         });
       }
     }
-    return out;
+    return courses;
   } 
 
 }
