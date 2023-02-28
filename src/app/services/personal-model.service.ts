@@ -309,33 +309,34 @@ export class PersonalModelService {
     });
   }
 
-  add_course(course:Course) {
+  async add_course(course:Course) {
     PersonalModelService.courses.push(course);
     this.sort_course_list();
     // TO DO: Push course to database 
   }
 
-  add_sleep(sleep:Sleep) {
+  async add_sleep(sleep:Sleep) {
     // TO DO: Push sleep to database
   }
 
-  get_last_sleep() {
-    // TO DO: Retrieve most recent sleep by date from database
+  async get_last_sleep() {
+    // TO DO: Retrieve most recent Sleep by date from database
   }
 
-  get_sleep_duration_avg(day:string) {
+  async get_sleep_duration_avg(day:string) {
     // TO DO: Retrieve AVG sleep duration (minutes?) from database
   }
 
-  add_sleepiness(sleepiness:Sleepiness) {
+  async add_sleepiness(sleepiness:Sleepiness) {
     // TO DO: Push sleepiness to database
   }
 
-  get_sleepiness_avg(day:string) {
+  async get_sleepiness_avg(day:string) {
     // TO DO: Retrieve AVG from database
+    
   }
 
-  remove_course(course:Course) {
+  async remove_course(course:Course) {
     PersonalModelService.courses = PersonalModelService.courses.filter((elm) => { return elm !== course });
     this.sort_course_list();
     // TO DO: Pop course from database
