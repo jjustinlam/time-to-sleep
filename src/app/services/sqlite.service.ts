@@ -40,7 +40,8 @@ export class SQLiteService {
         DROP TABLE Course;
         DROP TABLE Sleepiness;
         DROP TABLE OvernightSleep;
-      `).catch((e) => {
+      `)
+      .catch((e) => {
         console.log(e);
       });
     }
@@ -56,7 +57,8 @@ export class SQLiteService {
 
           PRIMARY KEY (day)
         );
-      `).catch((e) => {
+      `)
+      .catch((e) => {
         console.log(e);
       });
     }

@@ -333,6 +333,7 @@ export class PersonalModelService {
 
   async get_sleepiness_avg(day:string) {
     // TO DO: Retrieve AVG from database
+    
   }
 
   async remove_course(course:Course) {

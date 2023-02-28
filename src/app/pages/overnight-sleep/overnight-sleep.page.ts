@@ -10,7 +10,7 @@ import { Health } from '@awesome-cordova-plugins/health/ngx';
 
 
 export class OvernightSleepPage implements OnInit {
-  wakeup_time:Date;
+  wakeup_time: Date;
   sleep: string = "Error retrieving sleep data"; // placeholder text if unable to retrieve health data
 
   constructor(private personal_model: PersonalModelService, private health: Health) {
@@ -41,11 +41,15 @@ export class OvernightSleepPage implements OnInit {
 
 
   loadSleep() {
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(21, 0, 0, 0); // date from yesterday starting 9pm
+
     this.health.query({
-      startDate: new Date(new Date().getTime() - 24 * 60 * 60 * 1000), // past 24 hrs
+      startDate: yesterday, // start time = last night 9 pm
       endDate: new Date(), // now
       dataType: 'sleep',
-      limit: 100
+      limit: 1000
     }).then(data => {
 
       let sleepData = data.reduce((total, data) => {
@@ -56,8 +60,7 @@ export class OvernightSleepPage implements OnInit {
           return total + sleepDuration;
         }
         return total;
-      }, 0); // TODO: need to fix how sleep data is actually retrieved
-
+      }, 0);
       console.log(sleepData);
       this.sleep = this.formatTime(sleepData);
     })
@@ -81,7 +84,7 @@ export class OvernightSleepPage implements OnInit {
       date.setDate(date.getDate() + 1);
     } else {
       // e.g. 0:00 - 9:00, extreme case 1:00 - 1:00
-    }    
+    }
     date.setHours(recommended.wakeup.hour);
     date.setMinutes(recommended.wakeup.min);
     return date;
@@ -108,7 +111,7 @@ export class OvernightSleepPage implements OnInit {
 
       var diff = this.wakeup_time.valueOf() - now.valueOf();
       var hours = Math.floor(diff / (1000 * 60 * 60));
-      var minutes = Math.floor(diff / (1000* 60)) % 60;
+      var minutes = Math.floor(diff / (1000 * 60)) % 60;
 
       if (hours > 1) return `in ${hours} hours`;
       else if (hours > 0) return `in ${hours} hour`;
