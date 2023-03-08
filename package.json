@@ -25,6 +25,7 @@
     "@capacitor/android": "4.6.2",
     "@capacitor/app": "4.1.1",
     "@capacitor/core": "4.6.2",
+    "@capacitor/geolocation": "^4.1.0",
     "@capacitor/haptics": "4.1.0",
     "@capacitor/ios": "^4.7.0",
     "@capacitor/keyboard": "4.1.1",
@@ -40,6 +41,7 @@
     "rxjs": "^7.8.0",
     "swiper": "^8.4.7",
     "tslib": "^2.3.0",
+    "yelp-fusion": "^3.0.0",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
