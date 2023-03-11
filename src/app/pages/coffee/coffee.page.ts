@@ -13,6 +13,9 @@ export class CoffeePage implements OnInit {
   found_shops:Array<CoffeeShop> = [];
   shop:CoffeeShop;
   index:number;
+  APIKEY = "5EauOkDZtKc_L0v7KHW_g48BRNWS95gXWrsIkPfypG4ZjX5vqZLSbWvNsDE4jn5t0D1aYQRBV3PW-kSA683wqpBI7P-O_QG0q8-xDNhvnpr7xrCJ0JYWpgpAo6MGZHYx";
+  lat: number; // default to aldrich park
+  long: number; // default to aldrich park
 
   constructor() { }
 
@@ -20,50 +23,66 @@ export class CoffeePage implements OnInit {
   }
 
   find_coffee_shop() {
+    this.found_shops = [];
+
     //outputs latitude and longitude when button is clicked
     const coordinates = Geolocation.getCurrentPosition().then(resp=>{
       console.log(resp.coords.latitude);
       console.log(resp.coords.longitude);
-      // const lat = resp.coords.latitude;
-      // const long = resp.coords.longitude;
+      this.lat = resp.coords.latitude;
+      this.long = resp.coords.longitude;
       //insert function to retrieve coffee shops
+
+      var result_count = 20;
+      var radius = 3000; // search radius in meters
+
+
+      const options = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer 5EauOkDZtKc_L0v7KHW_g48BRNWS95gXWrsIkPfypG4ZjX5vqZLSbWvNsDE4jn5t0D1aYQRBV3PW-kSA683wqpBI7P-O_QG0q8-xDNhvnpr7xrCJ0JYWpgpAo6MGZHYx'
+        }
+      };
+  
+      fetch(`https://api.yelp.com/v3/businesses/search?latitude=${this.lat}&longitude=${this.long}&term=coffee&radius=${radius}&open_now=true&sort_by=distance&limit=${result_count}`, options)
+        .then(response => response.json())
+        .then(response => {
+          for (const shop of response.businesses) {
+            const name = shop.name;
+            const address = shop.location.display_address.join(", ");
+            const rating = shop.rating;
+            const distance_from_me = shop.distance;
+          
+            const coffeeShop = new CoffeeShop(name, address, rating, distance_from_me);
+          
+            this.found_shops.push(coffeeShop);
+            console.log(name);
+          }
+          console.log(this.found_shops);
+
+          // for each result from API sorted by distance from current location (maximum X entries OR maximum distance?):
+          console.log("BREAK")
+          this.index = 0;
+          this.shop = this.found_shops[this.index];
+          console.log(this.shop);
+        })
+        .catch(err => console.error(err));
     }).catch((error) => {
       console.log('Error getting location', error);
-    });
+    })
 
-
-    //function code
-    //code below doesnt work
-
-    // const sdk = require('api')('@yelp-developers/v1.0#1hzxg2alewxco5x');
-    //
-    // sdk.auth('Bearer 5EauOkDZtKc_L0v7KHW_g48BRNWS95gXWrsIkPfypG4ZjX5vqZLSbWvNsDE4jn5t0D1aYQRBV3PW-kSA683wqpBI7P-O_QG0q8-xDNhvnpr7xrCJ0JYWpgpAo6MGZHYx');
-    // sdk.v3_business_search({
-    //   latitude: '33.6551686', //test variables change to current location later
-    //   longitude: '-117.8399602', //test variables
-    //   term: 'coffee',
-    //   locale: 'en_US',
-    //   open_now: 'true',
-    //   sort_by: 'distance',
-    //   device_platform: 'mobile-generic',
-    //   limit: '20'
-    // }).then(({ data }) => console.log(data)) //issue with data variable
-    //   .catch((err) => console.error(err));
-
-    // TO DO
-    // for each result from API sorted by distance from current location (maximum X entries OR maximum distance?):
-    //  found_shops.push(new CoffeeShop(...));
-    // this.index = 0;
-    // this.shop = found_shops[this.index];
+ 
+    
   }
 
   back() {
-    // this.index = Math.min(this.index-1, 0);
-    // this.shop = found_shops[this.index];
+    this.index = Math.min(this.index-1, 0);
+    this.shop = this.found_shops[this.index];
   }
 
   forward() {
-    // this.index = Math.max(this.index-1, this.found_shops.length);
-    // this.shop = found_shops[this.index];
+    this.index = Math.max(this.index-1, this.found_shops.length);
+    this.shop = this.found_shops[this.index];
   }
 }

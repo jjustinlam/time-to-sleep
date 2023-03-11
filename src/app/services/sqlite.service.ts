@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite';
 import { Platform } from '@ionic/angular';
-import { RSA_NO_PADDING } from 'constants';
+// import { RSA_NO_PADDING } from 'constants';
 
 import { Course } from '../data/course';
 import { Sleep } from '../data/sleep';
