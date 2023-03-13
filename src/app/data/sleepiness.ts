@@ -1,3 +1,5 @@
+import { PersonalModelService } from "../services/personal-model.service";
+
 export class Sleepiness {
 	date:Date;
 	day:string;
@@ -5,9 +7,14 @@ export class Sleepiness {
 	
 	public static scale = [1,2,3,4,5,6,7];
 
-	constructor(now:Date, day:string, rating:number) {
-		this.date = now;
-		this.day = day.toLowerCase();
+	constructor(rating:number, now?:Date) {
+		if (now) this.date = now;
+		else this.date = new Date();
+
+		if (this.date.getHours() < 8) this.day = PersonalModelService.day_labels[(this.date.getDay() - 1) % 7];
+		else this.day = PersonalModelService.day_labels[this.date.getDay()];
+		
 		this.rating = rating;
 	}
+
 }

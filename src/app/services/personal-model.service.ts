@@ -14,6 +14,8 @@ export class PersonalModelService {
   public static day_labels = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
   public static courses:Course[] = [];
+  public static sleep_entries:Sleep[] = [];
+  public static sleepiness_scores:Sleepiness[] = [];
 
   // public static has_setup = false;
   // public static prefers_morning = false;
@@ -32,10 +34,10 @@ export class PersonalModelService {
 
   constructor(private sqlite:SQLiteService) { 
     // this.set_default_preferences();
-    // if (PersonalModelService.loadDefaultData) {
-    //   this.load_default_data();
-    // }
-    // PersonalModelService.loadDefaultData = false;
+    if (PersonalModelService.loadDefaultData) {
+      this.load_default_data();
+    }
+    PersonalModelService.loadDefaultData = false;
   }
 
   load_default_data() {
@@ -215,6 +217,60 @@ export class PersonalModelService {
     };
   }
 
+  // Returns the recommended sleep time (as a string) for a given day
+  async when_to_sleep(day?:string) {
+    var summary;
+    if (day) summary = await this.today(day.toLowerCase());
+    else {
+      var today = (new Date()).getDay();
+      if (today < 8) summary = await this.today(PersonalModelService.day_labels[(today - 1) % 7]);
+      else summary = await this.today(PersonalModelService.day_labels[today]);
+    }
+
+    return `${summary.sleep.hour}:${summary.sleep.min}`;
+  }
+
+  // Returns the recommended wakeup time (as a string) for a given day
+  async when_to_wakeup(day?:string) {
+    var summary;
+    if (day) summary = await this.today(day.toLowerCase());
+    else {
+      var today = (new Date()).getDay();
+      if (today < 8) summary = await this.today(PersonalModelService.day_labels[(today - 1) % 7]);
+      else summary = await this.today(PersonalModelService.day_labels[today]);
+    }
+
+    return `${summary.wakeup.hour}:${summary.wakeup.min}`;
+  }
+
+  // Returns the time (as a Date) to send a notification to let the user know when to sleep
+  async when_to_notify_sleep() {
+    var sleep_time = await this.when_to_sleep();
+    var [hour, min] = sleep_time.split(':');
+
+    var when = new Date();
+
+    var wind_down = await Preferences.get({key: 'WIND_DOWN_TIME'});
+
+    when.setHours(+hour);
+    when.setMinutes(+min - +wind_down);
+
+    return when;
+  }
+
+  // Returns the time (as a Date) to set the alarm
+  async when_to_alarm_wakeup() {
+    var wakeup_time = await this.when_to_wakeup();
+    var [hour, min] = wakeup_time.split(':');
+
+    var when = new Date();
+    if (when.getHours() < 24) when.setDate(when.getDate() + 1);
+    when.setHours(+hour);
+    when.setMinutes(+min);
+
+    return when;
+  }
+
   // Shift sleep for day:string by minutes:number. Positive values shift it forward.
   // e.g. shift_sleep('mon', 30) could shift it from 10:30pm to 11:00pm
   async shift_sleep(day:string, minutes:number) {
@@ -293,55 +349,105 @@ export class PersonalModelService {
     } else return -1;
   }
 
-
+  // Reset app data
   erase_data() {
     Preferences.clear();
     this.set_default_preferences();
     PersonalModelService.courses = [];
+    PersonalModelService.sleep_entries = [];
+    PersonalModelService.sleepiness_scores = [];
     AppComponent.active = false;
     this.sqlite.drop_tables();
     if (PersonalModelService.loadDefaultData) this.load_default_data();
   }
 
+  // Sorts the course list alphabetically
   sort_course_list() {
     PersonalModelService.courses.sort((a:Course, b:Course) => {
       return a.name.localeCompare(b.name);
     });
   }
 
+  // Adds a course to the course list, then sorts alphabetically
   async add_course(course:Course) {
     PersonalModelService.courses.push(course);
     this.sort_course_list();
     // TO DO: Push course to database 
   }
 
-  async add_sleep(sleep:Sleep) {
-    // TO DO: Push sleep to database
-  }
-
-  async get_last_sleep() {
-    // TO DO: Retrieve most recent Sleep by date from database
-  }
-
-  async get_sleep_duration_avg(day:string) {
-    // TO DO: Retrieve AVG sleep duration (minutes?) from database
-  }
-
-  async add_sleepiness(sleepiness:Sleepiness) {
-    // TO DO: Push sleepiness to database
-  }
-
-  async get_sleepiness_avg(day:string) {
-    // TO DO: Retrieve AVG from database
-    
-  }
-
+  // Removes a course from the courses list, then sorts alphabetically.
   async remove_course(course:Course) {
     PersonalModelService.courses = PersonalModelService.courses.filter((elm) => { return elm !== course });
     this.sort_course_list();
     // TO DO: Pop course from database
   }
 
+  // Retrieve all courses that take place on a given day.
+  async get_courses_by_day(day:string) {
+    var arr:Course[] = [];
+    var index = PersonalModelService.day_labels.findIndex((elm) => { return elm == day });
+    for (var i = 0; i < PersonalModelService.courses.length; i++) {
+      var course = PersonalModelService.courses[i];
+      if (course.days[index]) arr.push(course);
+    }
+    return arr;
+  }
+
+  // Adds a sleep entry to the sleep entries list. Assume sleep_entries is kept in chronological order.
+  async add_sleep(sleep:Sleep) {
+    PersonalModelService.sleep_entries.push(sleep);
+    // TO DO: Push sleep to database
+  }
+
+  // Retrieves the most recent sleep entry. Assume sleep_entries is kept in chronological order.
+  async get_last_sleep() {
+    if (PersonalModelService.sleep_entries.length) return PersonalModelService.sleep_entries[PersonalModelService.length-1];
+    else return null;
+    // TO DO: Retrieve most recent Sleep by date from database
+  }
+
+  // Retrieves the average sleep duration for a given day.
+  async get_sleep_duration_avg(day:string) {
+    var arr:Sleep[] = PersonalModelService.sleep_entries.filter((sleep) => {
+      return sleep.day == day;
+    });
+
+    var total = 0;
+    for (var i = 0; i < arr.length; i++) {
+      total += arr[i].duration;
+    }
+
+    if (total > 0) return total / arr.length;
+    else return -1;
+
+    // TO DO: Retrieve AVG sleep duration (minutes?) from database
+  }
+
+  // Adds a sleepiness score to sleepiness scores list. Assume sleepiness_scores is kept in chronological order.
+  async add_sleepiness(sleepiness:Sleepiness) {
+    PersonalModelService.sleepiness_scores.push(sleepiness);
+    // TO DO: Push sleepiness to database
+  }
+
+  // Retrieves the average sleepiness score for a given day.
+  async get_sleepiness_avg(day:string) {
+    var arr:Sleepiness[] = PersonalModelService.sleepiness_scores.filter((sleepiness) => {
+      return sleepiness.day == day;
+    });
+
+    var total = 0;
+    for (var i = 0; i < arr.length; i++) {
+      total += arr[i].rating;
+    }
+
+    if (total > 0) return total / arr.length;
+    else return -1;
+
+    // TO DO: Retrieve AVG from database
+    
+  }
+
+  // Change the time needed to wind up
   set_wind_up_time(minutes:number) {
     Preferences.set({key: 'wind_up_time', value: `${minutes}`});
     // PersonalModelService.wind_up_time = minutes;

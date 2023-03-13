@@ -1,8 +1,13 @@
+import { PersonalModelService } from "../services/personal-model.service";
+
 export class Sleep {
+	day:string;
 	time_sleep:Date;
 	time_wakeup:Date;
 
 	constructor(time_start:Date, time_end:Date) {
+		if (time_start.getHours() < 8) this.day = PersonalModelService.day_labels[(time_start.getDay() - 1) % 7];
+		else this.day = PersonalModelService.day_labels[time_start.getDay()];
 		this.time_sleep = time_start;
 		this.time_wakeup = time_end;
 	}
