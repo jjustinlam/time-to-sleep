@@ -250,7 +250,7 @@ export class PersonalModelService {
 
     var when = new Date();
 
-    var wind_down = await Preferences.get({key: 'WIND_DOWN_TIME'});
+    var wind_down = await this.WIND_DOWN_TIME();
 
     when.setHours(+hour);
     when.setMinutes(+min - +wind_down);

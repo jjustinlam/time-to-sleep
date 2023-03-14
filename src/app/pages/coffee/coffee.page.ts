@@ -52,7 +52,7 @@ export class CoffeePage implements OnInit {
             const name = shop.name;
             const address = shop.location.display_address.join(", ");
             const rating = shop.rating;
-            const distance_from_me = shop.distance;
+            const distance_from_me = shop.distance / 1609.344; // to miles
           
             const coffeeShop = new CoffeeShop(name, address, rating, distance_from_me);
           
@@ -77,12 +77,12 @@ export class CoffeePage implements OnInit {
   }
 
   back() {
-    this.index = Math.min(this.index-1, 0);
+    this.index = Math.max(this.index-1, 0);
     this.shop = this.found_shops[this.index];
   }
 
   forward() {
-    this.index = Math.max(this.index-1, this.found_shops.length);
+    this.index = Math.min(this.index+1, this.found_shops.length-1);
     this.shop = this.found_shops[this.index];
   }
 }

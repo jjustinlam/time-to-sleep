@@ -15,23 +15,18 @@
   </ion-button>
 
   <ion-card *ngIf="this.found_shops.length > 0">
-    <ion-card-header>
+    <ion-toolbar>
       <ion-button (click)="back()" shape="round" slot="start" color="primary" class="ion-padding">
-        <ion-icon name="arrow-forward" slot="icon-only"></ion-icon>
-      </ion-button>
-      <ion-button (click)="forward()" shape="round" slot="start" color="primary" class="ion-padding">
         <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
       </ion-button>
-      Where to Find Coffee Right Now
-    </ion-card-header>
+      <ion-button (click)="forward()" shape="round" slot="end" color="primary" class="ion-padding">
+        <ion-icon name="arrow-forward" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-toolbar>
     <ion-card-content>
-      <!-- Found location goes here -->
-      <!-- If possible, Google Maps would be nice. Otherwise, name of the cafe, distance, and address? -->
-      {{ this.shop.name }}
-      {{ this.shop.address }}
-      {{ this.shop.rating }}    <!-- x/5 stars -->
-      {{ this.shop.distance_from_me }}  <!-- in meters i think -->
-
+      <h1>{{this.shop.name}} ({{this.shop.rating}} stars)</h1> 
+      <p>{{this.shop.address}}</p>
+      <p>{{ this.shop.distance_from_me.toFixed(2) }} miles away</p>
     </ion-card-content>
   </ion-card>
 </ion-content>
