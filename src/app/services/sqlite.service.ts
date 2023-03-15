@@ -33,14 +33,20 @@ export class SQLiteService {
       }).catch((e) => {
         console.log(e);
       });
-      
+
       this.initCourses();
       this.initSleepiness();
-      this.initOvernightSleepiness();
+      this.initOvernightSleep();
     } catch (e) {
       console.log('Your device does not support SQLite natively');
     }
     SQLiteService.initialized = true;
+  }
+
+  hard_reset() {
+    this.drop_tables();
+    this.native = false;
+    SQLiteService.initialized = false;
   }
 
   drop_tables() {
@@ -119,7 +125,7 @@ export class SQLiteService {
   //   return -1;
   // }
 
-  initOvernightSleepiness() {
+  initOvernightSleep() {
     if (this.native) {
       this.db.executeSql(`
         CREATE TABLE OvernightSleep(
@@ -134,7 +140,7 @@ export class SQLiteService {
     }
   }
 
-  insertOvernightSleepiness(sleep:Sleep) {
+  insertOvernightSleep(sleep:Sleep) {
     if (this.native) {
       this.db.executeSql('INSERT INTO OvernightSleep VALUES (?)', [sleep.time_sleep, sleep.time_wakeup])
       .catch((e) => {
@@ -143,7 +149,7 @@ export class SQLiteService {
     }
   }
 
-  retrieveOvernightSleepiness() : Array<Sleep> {
+  retrieveOvernightSleep() : Array<Sleep> {
     var sleep_entries:Sleep[] = [];
     if (this.native) {
       this.db.executeSql(`

@@ -16,7 +16,31 @@ export class SettingsPage implements OnInit {
   constructor(private personal_model: PersonalModelService, private alertController:AlertController, private pickerController:PickerController, private router:Router, private health: Health) { }
 
   ngOnInit() {
-    // TO DO: Retrieve wind up time ?
+  }
+
+  async load_default_data() {
+    const alert = await this.alertController.create({
+      header: 'Overwrite current data with static data?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Confirm',
+          role: 'confirm'
+        }
+      ]
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+
+    if (role == 'confirm') {
+      this.personal_model.load_default_data();
+      this.router.navigateByUrl('pages/my-schedule');
+    }
   }
 
   async clear_data() {

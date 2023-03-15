@@ -40,8 +40,78 @@ export class PersonalModelService {
     PersonalModelService.loadDefaultData = false;
   }
 
-  load_default_data() {
+  async load_default_data() {
+    return;
     // TO DO: Default data
+    this.erase_data();
+
+    if ((await Preferences.get({key: 'has_setup'})).value === null) Preferences.set({key: 'has_setup', value: 'true'});
+
+    // Morning or night person
+    if ((await Preferences.get({key: 'prefers_morning'})).value === null) Preferences.set({key: 'prefers_morning', value: 'false'});
+
+    // Send a notification this amount of time, in minutes, before recommended sleep time to tell the user when to begin winding down for the day
+    if ((await Preferences.get({key: 'WIND_DOWN_TIME'})).value === null) Preferences.set({key: 'WIND_DOWN_TIME', value: '30'});
+
+    // When to wake up the user for in person classes, in minutes
+    if ((await Preferences.get({key: 'wind_up_time'})).value === null) Preferences.set({key: 'wind_up_time', value: '60'});
+
+    // When to wake up the user for remote synchronous classes, in minutes
+    if ((await Preferences.get({key: 'wind_up_time_remote'})).value === null) Preferences.set({key: 'wind_up_time_remote', value: '30'});
+
+    // When to wake up the user for remote asynchronous classes, in minutes
+    if ((await Preferences.get({key: 'wind_up_time_async'})).value === null) Preferences.set({key: 'wind_up_time_async', value: '-1'});
+
+    // Recommended times to sleep and to wakeup by day (based on recommended overnight sleep) // TO DO
+    if ((await Preferences.get({key: 'sun'})).value === null) Preferences.set({key: 'sun', value: '23:00 - 7:00'}); // Weekend
+    if ((await Preferences.get({key: 'mon'})).value === null) Preferences.set({key: 'mon', value: '23:00 - 7:00'});
+    if ((await Preferences.get({key: 'tue'})).value === null) Preferences.set({key: 'tue', value: '23:00 - 7:00'}); // Early class
+    if ((await Preferences.get({key: 'wed'})).value === null) Preferences.set({key: 'wed', value: '23:00 - 7:00'});
+    if ((await Preferences.get({key: 'thu'})).value === null) Preferences.set({key: 'thu', value: '23:00 - 7:00'}); // Early class
+    if ((await Preferences.get({key: 'fri'})).value === null) Preferences.set({key: 'fri', value: '0:30 - 9:50'}); // "Busiest" day, most sleep needed
+    if ((await Preferences.get({key: 'sat'})).value === null) Preferences.set({key: 'sat', value: '23:00 - 7:00'}); // Weekend
+
+    // Set today to be Monday March 20th, 8:00 PM
+    const today = new Date(2023, 2, 20, 8, 0);
+
+    var time_only = function(hour:number, min:number) {
+      return new Date(today.getFullYear(), today.getMonth(), today.getDate(), hour, min);
+    };
+    var today_offset = function(days_before:number, hour:number, min:number) {
+      return new Date(today.getFullYear(), today.getMonth(), today.getDate() - days_before, hour, min);
+    };
+
+    // Courses
+    PersonalModelService.courses = [
+      new Course("Comp Sci 125",  "Lec", "In person", [false,false,true ,false,true ,false,false], time_only(11, 0), time_only(12, 20)),
+      new Course("Comp Sci 147",  "Lec", "In person", [false,false,true ,false,true ,false,false], time_only(9, 30), time_only(10, 50)),
+      new Course("Comp Sci 147",  "Lab", "In person", [false,false,false,false,false,true ,false], time_only(11, 0), time_only(11, 50)),
+      new Course("I&C Sci 9",     "Lec", "In person", [false,true ,false,true ,true ,false,false], time_only(11, 0), time_only(12, 20)),
+      new Course("I&C Sci 9",     "Lab", "In person", [false,true ,false,true ,true ,false,false], time_only(17, 0), time_only(18, 20)),
+      new Course("I&C Sci 9",     "Stu", "In person", [false,false,false,false,false,true ,false], time_only(14, 0), time_only(16, 50)),
+    ];
+    
+    // Sleep data (last 2 weeks) // TO DO
+    PersonalModelService.sleep_entries = [
+      new Sleep(today_offset(14, 11, 0), today_offset(13, 8, 0)),
+    ];
+
+    // Sleepiness scores (last 2 weeks) // TO DO
+    PersonalModelService.sleepiness_scores = [
+
+    ];
+
+  }
+
+  // Reset app data
+  erase_data() {
+    Preferences.clear();
+    this.set_default_preferences();
+    PersonalModelService.courses = [];
+    PersonalModelService.sleep_entries = [];
+    PersonalModelService.sleepiness_scores = [];
+    AppComponent.active = false;
+    this.sqlite.hard_reset();
   }
 
   load_courses() {
@@ -49,7 +119,7 @@ export class PersonalModelService {
   }
 
   load_sleep_entries() {
-    PersonalModelService.sleep_entries = this.sqlite.retrieveOvernightSleepiness();
+    PersonalModelService.sleep_entries = this.sqlite.retrieveOvernightSleep();
   }
 
   load_sleepiness_scores() {
@@ -60,7 +130,7 @@ export class PersonalModelService {
     if ((await Preferences.get({key: 'has_setup'})).value === null) Preferences.set({key: 'has_setup', value: 'false'});
 
     // Morning or night person
-    if ((await Preferences.get({key: 'prefers_morning'})).value === null) Preferences.set({key: 'prefers_morning', value: 'false'});
+    if ((await Preferences.get({key: 'prefers_morning'})).value === null) Preferences.set({key: 'prefers_morning', value: 'true'});
 
     // Send a notification this amount of time, in minutes, before recommended sleep time to tell the user when to begin winding down for the day
     if ((await Preferences.get({key: 'WIND_DOWN_TIME'})).value === null) Preferences.set({key: 'WIND_DOWN_TIME', value: '30'});
@@ -290,26 +360,9 @@ export class PersonalModelService {
     return when;
   }
 
-  // Returns the time (as a Date) to set the alarm
-  // async when_to_alarm_wakeup() {
-  //   var when = new Date();
-  //   var summary = await this.today(PersonalModelService.day_labels[(when.getDay()) % 7]);
-    
-  //   var now = (when.getHours()) * 60 + (when.getMinutes());
-  //   var wakeup = (summary.wakeup.hour) * 60 + (summary.wakeup.min);
-
-  //   // e.g. now is 2:00am and wakeup is 10:00am
-  //   if (now <= wakeup) summary = await this.today(PersonalModelService.day_labels[(when.getDay()-1) % 7]);
-  //   else when.setDate(when.getDate() + 1);
-
-  //   when.setHours(summary.wakeup.hour);
-  //   when.setMinutes(summary.wakeup.min);
-
-  //   return when;
-  // }
-
   // Shift sleep for day:string by minutes:number. Positive values shift it forward.
   // e.g. shift_sleep('mon', 30) could shift it from 10:30pm to 11:00pm
+  // Returns false on failure (e.g. conflict with class)
   async shift_sleep(day:string, minutes:number) {
     const { value } = await Preferences.get({key: day.toLowerCase()});
     if (value) {
@@ -326,9 +379,11 @@ export class PersonalModelService {
 
       Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${wakeup_hour}:${wakeup_min}`});
     } else console.log('Could not change sleep time');
+    return true;
   }
 
   // Set the sleep time manually for day:string
+  // Returns false on failure (e.g. conflict with class)
   async set_sleep(day:string, hour:number, min:number) {
     const { value } = await Preferences.get({key: day.toLowerCase()});
     if (value) {
@@ -342,6 +397,7 @@ export class PersonalModelService {
 
   // Shift wakeup for day:string by minutes:number. Positive values shift it forward.
   // e.g. shift_wakeup('mon', 30) could shift it from 8:00am to 8:30am
+  // Returns false on failure (e.g. conflict with class)
   async shift_wakeup(day:string, minutes:number) {
     const { value } = await Preferences.get({key: day.toLowerCase()});
     if (value) {
@@ -361,6 +417,7 @@ export class PersonalModelService {
   }
 
   // Set the sleep time manually for day:string
+  // Returns false on failure (e.g. conflict with class)
   async set_wakeup(day:string, hour:number, min:number) {
     const { value } = await Preferences.get({key: day.toLowerCase()});
     if (value) {
@@ -394,21 +451,11 @@ export class PersonalModelService {
     } else return -1;
   }
 
-  // Reset app data
-  erase_data() {
-    Preferences.clear();
-    this.set_default_preferences();
-    PersonalModelService.courses = [];
-    PersonalModelService.sleep_entries = [];
-    PersonalModelService.sleepiness_scores = [];
-    AppComponent.active = false;
-    this.sqlite.drop_tables();
-    if (PersonalModelService.loadDefaultData) this.load_default_data();
-  }
-
   // Sorts the course list alphabetically
   sort_course_list() {
     PersonalModelService.courses.sort((a:Course, b:Course) => {
+      return a.type.localeCompare(b.type);
+    }).sort((a:Course, b:Course) => {
       return a.name.localeCompare(b.name);
     });
   }
@@ -417,14 +464,14 @@ export class PersonalModelService {
   async add_course(course:Course) {
     PersonalModelService.courses.push(course);
     this.sort_course_list();
-    // TO DO: Push course to database 
+    this.sqlite.insertCourse(course);
   }
 
   // Removes a course from the courses list, then sorts alphabetically.
   async remove_course(course:Course) {
     PersonalModelService.courses = PersonalModelService.courses.filter((elm) => { return elm !== course });
     this.sort_course_list();
-    // TO DO: Pop course from database
+    this.sqlite.removeCourse(course);
   }
 
   // Retrieve all courses that take place on a given day.
@@ -441,14 +488,13 @@ export class PersonalModelService {
   // Adds a sleep entry to the sleep entries list. Assume sleep_entries is kept in chronological order.
   async add_sleep(sleep:Sleep) {
     PersonalModelService.sleep_entries.push(sleep);
-    // TO DO: Push sleep to database
+    this.sqlite.insertOvernightSleep(sleep);
   }
 
   // Retrieves the most recent sleep entry. Assume sleep_entries is kept in chronological order.
   async get_last_sleep() {
     if (PersonalModelService.sleep_entries.length) return PersonalModelService.sleep_entries[PersonalModelService.length-1];
     else return null;
-    // TO DO: Retrieve most recent Sleep by date from database
   }
 
   // Retrieves the average sleep duration for a given day.
@@ -464,14 +510,12 @@ export class PersonalModelService {
 
     if (total > 0) return total / arr.length;
     else return -1;
-
-    // TO DO: Retrieve AVG sleep duration (minutes?) from database
   }
 
   // Adds a sleepiness score to sleepiness scores list. Assume sleepiness_scores is kept in chronological order.
   async add_sleepiness(sleepiness:Sleepiness) {
     PersonalModelService.sleepiness_scores.push(sleepiness);
-    // TO DO: Push sleepiness to database
+    this.sqlite.insertSleepiness(sleepiness);
   }
 
   // Retrieves the average sleepiness score for a given day.
@@ -487,9 +531,6 @@ export class PersonalModelService {
 
     if (total > 0) return total / arr.length;
     else return -1;
-
-    // TO DO: Retrieve AVG from database
-    
   }
 
   // Change the time needed to wind up

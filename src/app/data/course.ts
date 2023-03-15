@@ -8,6 +8,7 @@ export class Course {
 
 	static day_labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	static course_types = ['Act', 'Col', 'Dis', 'Fld', 'Lab', 'Lec', 'Qiz', 'Res', 'Sem', 'Stu', 'Tap', 'Tut'];
+	static format_types = ['In person', 'Synchronous remote', 'Asynchronous remote'];
 
 	constructor(name:string, type:string, format:string, selected_days:Array<boolean>, time_start:Date, time_end:Date) {
 		this.name = name;
