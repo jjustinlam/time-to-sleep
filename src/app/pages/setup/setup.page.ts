@@ -57,11 +57,13 @@ export class SetupPage implements OnInit {
     if (this.swiper.isEnd) {
       Preferences.set({key: 'has_setup', value: 'true'});
       Preferences.set({key: 'prefers_morning', value: `${this.prefers_morning}`});
-      for (var i = 0; i < PersonalModelService.day_labels.length; i++) {
-        // if user prefers night, shift all wakeup and sleep times by 2 hours (i.e. 1:00 - 9:00)
-        var day = PersonalModelService.day_labels[i];
-        this.personal_model.shift_sleep(day, 2*60);
-        this.personal_model.shift_wakeup(day, 2*60);
+      if (!this.prefers_morning) {
+        for (var i = 0; i < PersonalModelService.day_labels.length; i++) {
+          // if user prefers night, shift all wakeup and sleep times by 2 hours (i.e. 1:00 - 9:00)
+          var day = PersonalModelService.day_labels[i];
+          this.personal_model.shift_sleep(day, 2*60);
+          this.personal_model.shift_wakeup(day, 2*60);
+        }
       }
       Preferences.set({key: 'wind_up_time', value: `${this.wind_up_time}`});
       AppComponent.active = true;

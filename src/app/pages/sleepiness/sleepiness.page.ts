@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { PersonalModelService } from 'src/app/services/personal-model.service';
 
 @Component({
   selector: 'app-sleepiness',
@@ -8,9 +9,10 @@ import { Component, OnInit } from '@angular/core';
 export class SleepinessPage implements OnInit {
   logged_value:number;
 
-  constructor() { }
+  constructor(private personal_model:PersonalModelService) { }
 
   ngOnInit() {
+    if (PersonalModelService.sleepiness_scores.length < 1) this.personal_model.load_sleepiness_scores();
   }
 
   pin_formatter(value:number) {

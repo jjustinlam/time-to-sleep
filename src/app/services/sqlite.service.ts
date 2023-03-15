@@ -14,9 +14,11 @@ import { Sleepiness } from '../data/sleepiness';
 export class SQLiteService {
   db:SQLiteObject;
   native:boolean = false;
+
+  public static initialized:boolean = false;
   
   constructor(private platform:Platform) {
-    this.initPlugin();
+    if (!SQLiteService.initialized) this.initPlugin();
   }
 
   initPlugin() {
@@ -28,10 +30,17 @@ export class SQLiteService {
       }).then((db:SQLiteObject) => {
         this.db = db;
         this.native = true;
+      }).catch((e) => {
+        console.log(e);
       });
+      
+      this.initCourses();
+      this.initSleepiness();
+      this.initOvernightSleepiness();
     } catch (e) {
       console.log('Your device does not support SQLite natively');
     }
+    SQLiteService.initialized = true;
   }
 
   drop_tables() {
@@ -51,11 +60,10 @@ export class SQLiteService {
     if (this.native) {
       this.db.executeSql(`
         CREATE TABLE Sleepiness(
-          date DATETIME, 
-          day CHAR(3),
-          score INTEGER,
+          date DATETIME,
+          rating INTEGER,
 
-          PRIMARY KEY (day)
+          PRIMARY KEY (date)
         );
       `)
       .catch((e) => {
@@ -72,25 +80,44 @@ export class SQLiteService {
       // `).catch((e) => {
       //   console.log(e);
       // });
-      this.db.executeSql('INSERT INTO Sleepiness VALUES (?)', [sleepiness.date, sleepiness.day, sleepiness.rating]);
+      this.db.executeSql('INSERT INTO Sleepiness VALUES (?)', [sleepiness.date, sleepiness.rating]);
     }
   }
 
-  getAverageSleepiness(day:string) {
+  retrieveSleepiness() : Array<Sleepiness> {
+    var sleepiness_scores:Sleepiness[] = [];
     if (this.native) {
       this.db.executeSql(`
-        SELECT AVG(S.score) AS average
+        SELECT S.date, S.day, S.rating
         FROM Sleepiness S
-        WHERE S.day = ?
-      `, [day]
-      ).then(rs => {
-        return rs.rows.item(0).average;
+        ORDER BY S.date ASC
+      `).then((result) => {
+        for (var i = 0; i < result.rows.length; i++) {
+          var s = result.rows.item(i);
+          sleepiness_scores.push(new Sleepiness(s.rating, s.date));
+        }
       }).catch((e) => {
         console.log(e);
       });
     }
-    return -1;
+    return sleepiness_scores;
   }
+
+  // getAverageSleepiness(day:string) {
+  //   if (this.native) {
+  //     this.db.executeSql(`
+  //       SELECT AVG(S.score) AS average
+  //       FROM Sleepiness S
+  //       WHERE S.day = ?
+  //     `, [day]
+  //     ).then(rs => {
+  //       return rs.rows.item(0).average;
+  //     }).catch((e) => {
+  //       console.log(e);
+  //     });
+  //   }
+  //   return -1;
+  // }
 
   initOvernightSleepiness() {
     if (this.native) {
@@ -116,6 +143,25 @@ export class SQLiteService {
     }
   }
 
+  retrieveOvernightSleepiness() : Array<Sleep> {
+    var sleep_entries:Sleep[] = [];
+    if (this.native) {
+      this.db.executeSql(`
+        SELECT O.timeStart, O.timeEnd
+        FROM OvernightSleep O
+        ORDER BY O.timeStart ASC
+      `).then((result) => {
+        for (var i = 0; i < result.rows.length; i++) {
+          var o = result.rows.item(i);
+          sleep_entries.push(new Sleep(o.sleepStart, o.sleepEnd));
+        }
+      }).catch((e) => {
+        console.log(e);
+      });
+    }
+    return sleep_entries;
+  }
+
   initCourses() {
     if (this.native) {
       this.db.executeSql(`
@@ -124,8 +170,8 @@ export class SQLiteService {
           type VARCHAR(32),
           format VARCHAR(32),
           days CHAR(7),
-          time_start DATETIME,
-          time_end DATETIME,
+          timeStart DATETIME,
+          timeEnd DATETIME,
 
           PRIMARY KEY (name, type)
         );
@@ -163,33 +209,50 @@ export class SQLiteService {
     }
   }
   
-  retrieveCoursesByDay(day:string) : Array<Course> {
-    var index = Course.day_labels.indexOf(day);
-    var courses:Array<Course> = [];
+  retrieveCourses() : Array<Course> {
+    var courses:Course[] = [];
     if (this.native) {
-      if (index >= 0) {
-        var arr = new Array(7).fill("0");
-        arr[index] = "1";
-        this.db.executeSql(`
-          SELECT C.name, C.time_start, C.time_end
-          FROM Course C
-          WHERE C.days = ?
-        `, [arr.join('')])
-        .then((result) => {
-          for (var i = 0; i < result.rows.length; i++) {
-            var entry = result.rows.item(i);
-            var days = [];
-            for (var j = 0; j < entry.days.length; j++) {
-              if (entry.days[j] === '1') days.push(true);
-              else days.push(false);
-            }
-            courses.push(new Course(entry.name, entry.type, entry.format, days, entry.time_start, entry.time_end));
+      this.db.executeSql(`
+        SELECT C.name, C.type, C.format, C.days, C.time_start, C.time_end
+        FROM Courses C
+        ORDER BY C.name ASC
+      `).then((result) => {
+        for (var i = 0; i < result.rows.length; i++) {
+          var c = result.rows.item(i);
+          var days:boolean[] = new Array(7).fill(false);
+          for (var j = 0; j < c.days.length; j++) {
+            days[j] = (c.days[j] === '1');
           }
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-      }
+          courses.push(new Course(c.name, c.type, c.format, days, c.timeStart, c.timeEnd));
+        }
+      }).catch((e) => {
+        console.log(e);
+      });
+    }
+    return courses;
+  }
+
+  retrieveCoursesByDay(day:string) : Array<Course> {
+    var index = Course.day_labels.indexOf(day.toLowerCase());
+    var courses:Course[] = [];
+    if (this.native && index >= 0) {
+      this.db.executeSql(`
+        SELECT C.name, C.time_start, C.time_end
+        FROM Course C
+      `).then((result) => {
+        for (var i = 0; i < result.rows.length; i++) {
+          var c = result.rows.item(i);
+          if (c.days[index] === '1') {
+            var days:boolean[] = new Array(7).fill(false);
+            for (var j = 0; j < c.days.length; j++) {
+              days[j] = (c.days[j] === '1');
+            }
+            courses.push(new Course(c.name, c.type, c.format, days, c.timeStart, c.timeEnd));
+          }
+        }
+      }).catch((e) => {
+        console.log(e);
+      });
     }
     return courses;
   } 

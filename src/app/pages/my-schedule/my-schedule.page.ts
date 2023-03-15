@@ -12,6 +12,7 @@ export class MySchedulePage implements OnInit {
   constructor(private personal_model:PersonalModelService) { }
 
   ngOnInit() {
+    if (PersonalModelService.courses.length < 1) this.personal_model.load_courses();
   }
 
 }

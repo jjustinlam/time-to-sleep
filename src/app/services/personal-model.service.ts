@@ -41,7 +41,19 @@ export class PersonalModelService {
   }
 
   load_default_data() {
-    // TO DO
+    // TO DO: Default data
+  }
+
+  load_courses() {
+    PersonalModelService.courses = this.sqlite.retrieveCourses();
+  }
+
+  load_sleep_entries() {
+    PersonalModelService.sleep_entries = this.sqlite.retrieveOvernightSleepiness();
+  }
+
+  load_sleepiness_scores() {
+    PersonalModelService.sleepiness_scores = this.sqlite.retrieveSleepiness();
   }
 
   async set_default_preferences() {
@@ -217,59 +229,84 @@ export class PersonalModelService {
     };
   }
 
-  // Returns the recommended sleep time (as a string) for a given day
+  // Returns the recommended sleep time (as a Date) for a given day
   async when_to_sleep(day?:string) {
+    var when = new Date();
+
     var summary;
-    if (day) summary = await this.today(day.toLowerCase());
-    else {
-      var today = (new Date()).getDay();
-      if (today < 8) summary = await this.today(PersonalModelService.day_labels[(today - 1) % 7]);
-      else summary = await this.today(PersonalModelService.day_labels[today]);
+    if (day) {
+      summary = await this.today(day.toLowerCase());
+    } else {
+      summary = await this.today(PersonalModelService.day_labels[(when.getDay()) % 7]);
+
+      var now = (when.getHours()) * 60 + (when.getMinutes());
+      var sleep = (summary.sleep.hour) * 60 + (summary.sleep.min);
+
+      // e.g. now is 12:01am and sleep is 2am
+      if (now <= sleep) summary = await this.today(PersonalModelService.day_labels[(when.getDay()-1) % 7]);
+      else when.setDate(when.getDate() + 1);
     }
 
-    return `${summary.sleep.hour}:${summary.sleep.min}`;
+    when.setHours(summary.sleep.hour);
+    when.setMinutes(summary.sleep.min);
+
+    return when;
   }
 
-  // Returns the recommended wakeup time (as a string) for a given day
+  // Returns the recommended wakeup time (as a Date) for a given day
   async when_to_wakeup(day?:string) {
+    var when = new Date();
     var summary;
-    if (day) summary = await this.today(day.toLowerCase());
-    else {
-      var today = (new Date()).getDay();
-      if (today < 8) summary = await this.today(PersonalModelService.day_labels[(today - 1) % 7]);
-      else summary = await this.today(PersonalModelService.day_labels[today]);
+
+    if (day) {
+      summary = await this.today(day.toLowerCase());
+    } else {
+      summary = await this.today(PersonalModelService.day_labels[(when.getDay()) % 7]);
+    
+      var now = (when.getHours()) * 60 + (when.getMinutes());
+      var wakeup = (summary.wakeup.hour) * 60 + (summary.wakeup.min);
+
+      // e.g. now is 2:00am and wakeup is 10:00am
+      if (now <= wakeup) summary = await this.today(PersonalModelService.day_labels[(when.getDay()-1) % 7]);
+      else when.setDate(when.getDate() + 1);
     }
 
-    return `${summary.wakeup.hour}:${summary.wakeup.min}`;
+    when.setHours(summary.wakeup.hour);
+    when.setMinutes(summary.wakeup.min);
+
+    return when;
   }
 
   // Returns the time (as a Date) to send a notification to let the user know when to sleep
   async when_to_notify_sleep() {
-    var sleep_time = await this.when_to_sleep();
-    var [hour, min] = sleep_time.split(':');
+    var when = await this.when_to_sleep();
 
-    var when = new Date();
+    var wind_down = +(await this.WIND_DOWN_TIME());
 
-    var wind_down = await this.WIND_DOWN_TIME();
-
-    when.setHours(+hour);
-    when.setMinutes(+min - +wind_down);
+    // when.setHours(summary.sleep.hour);
+    // when.setMinutes(summary.sleep.min - wind_down);
+    when.setMinutes(-wind_down);
 
     return when;
   }
 
   // Returns the time (as a Date) to set the alarm
-  async when_to_alarm_wakeup() {
-    var wakeup_time = await this.when_to_wakeup();
-    var [hour, min] = wakeup_time.split(':');
+  // async when_to_alarm_wakeup() {
+  //   var when = new Date();
+  //   var summary = await this.today(PersonalModelService.day_labels[(when.getDay()) % 7]);
+    
+  //   var now = (when.getHours()) * 60 + (when.getMinutes());
+  //   var wakeup = (summary.wakeup.hour) * 60 + (summary.wakeup.min);
 
-    var when = new Date();
-    if (when.getHours() < 24) when.setDate(when.getDate() + 1);
-    when.setHours(+hour);
-    when.setMinutes(+min);
+  //   // e.g. now is 2:00am and wakeup is 10:00am
+  //   if (now <= wakeup) summary = await this.today(PersonalModelService.day_labels[(when.getDay()-1) % 7]);
+  //   else when.setDate(when.getDate() + 1);
 
-    return when;
-  }
+  //   when.setHours(summary.wakeup.hour);
+  //   when.setMinutes(summary.wakeup.min);
+
+  //   return when;
+  // }
 
   // Shift sleep for day:string by minutes:number. Positive values shift it forward.
   // e.g. shift_sleep('mon', 30) could shift it from 10:30pm to 11:00pm
@@ -277,11 +314,15 @@ export class PersonalModelService {
     const { value } = await Preferences.get({key: day.toLowerCase()});
     if (value) {
       var [sleep_time, wakeup_time] = value.split(' - ');
-      var [sleep_hour, sleep_min] = sleep_time.split(':');
-      var [wakeup_hour, wakeup_min] = wakeup_time.split(':');
+      var [sleep_hour, sleep_min] = sleep_time.split(':').map(Number);
+      var [wakeup_hour, wakeup_min] = wakeup_time.split(':').map(Number);
 
-      sleep_hour += Math.floor(Math.abs(minutes) / 60) * Math.sign(minutes);
-      sleep_min += Math.floor(Math.abs(minutes) % 60) * Math.sign(minutes);
+      sleep_min += (Math.floor(Math.abs(minutes) % 60) * Math.sign(minutes));
+      if (sleep_min >= 60) {
+        sleep_hour = (sleep_hour + 1) % 24;
+        sleep_min %= 60;
+      }
+      sleep_hour += (Math.floor(Math.abs(minutes) / 60) * Math.sign(minutes)) % 24;
 
       Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${wakeup_hour}:${wakeup_min}`});
     } else console.log('Could not change sleep time');
@@ -292,8 +333,8 @@ export class PersonalModelService {
     const { value } = await Preferences.get({key: day.toLowerCase()});
     if (value) {
       var [sleep_time, wakeup_time] = value.split(' - ');
-      var [sleep_hour, sleep_min] = sleep_time.split(':');
-      var [wakeup_hour, wakeup_min] = wakeup_time.split(':');
+      var [sleep_hour, sleep_min] = sleep_time.split(':').map(Number);
+      var [wakeup_hour, wakeup_min] = wakeup_time.split(':').map(Number);
 
       Preferences.set({key: day.toLowerCase(), value: `${hour}:${min} - ${wakeup_hour}:${wakeup_min}`});
     } else console.log('Could not change sleep time');
@@ -305,11 +346,15 @@ export class PersonalModelService {
     const { value } = await Preferences.get({key: day.toLowerCase()});
     if (value) {
       var [sleep_time, wakeup_time] = value.split(' - ');
-      var [sleep_hour, sleep_min] = sleep_time.split(':');
-      var [wakeup_hour, wakeup_min] = wakeup_time.split(':');
+      var [sleep_hour, sleep_min] = sleep_time.split(':').map(Number);
+      var [wakeup_hour, wakeup_min] = wakeup_time.split(':').map(Number);
 
-      wakeup_hour += Math.floor(Math.abs(minutes) / 60) * Math.sign(minutes);
-      wakeup_min += Math.floor(Math.abs(minutes) % 60) * Math.sign(minutes);
+      wakeup_min += (Math.floor(Math.abs(minutes) % 60) * Math.sign(minutes));
+      if (wakeup_min >= 60) {
+        wakeup_hour = (wakeup_hour + 1) % 24;
+        wakeup_min %= 60;
+      }
+      wakeup_hour += (Math.floor(Math.abs(minutes) / 60) * Math.sign(minutes)) % 24;
 
       Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${wakeup_hour}:${wakeup_min}`});
     } else console.log('Could not change wakeup time');

@@ -1,15 +1,17 @@
 import { PersonalModelService } from "../services/personal-model.service";
 
 export class Sleep {
-	day:string;
 	time_sleep:Date;
 	time_wakeup:Date;
 
 	constructor(time_start:Date, time_end:Date) {
-		if (time_start.getHours() < 8) this.day = PersonalModelService.day_labels[(time_start.getDay() - 1) % 7];
-		else this.day = PersonalModelService.day_labels[time_start.getDay()];
 		this.time_sleep = time_start;
 		this.time_wakeup = time_end;
+	}
+
+	get day():string {
+		if (this.time_sleep.getHours() < 8) return PersonalModelService.day_labels[(this.time_sleep.getDay() - 1) % 7];
+		else return PersonalModelService.day_labels[this.time_sleep.getDay()];
 	}
 
 	// Returns the duration in minutes of the sleep for this entry

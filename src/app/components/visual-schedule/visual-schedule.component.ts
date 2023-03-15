@@ -28,7 +28,6 @@ export class VisualScheduleComponent implements OnInit {
 
   ngOnInit() {
     this.reset_modal();
-    // TO DO: Load schedule from database, if it exists
   }
 
   get courses() {
