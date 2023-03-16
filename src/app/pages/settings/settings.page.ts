@@ -4,6 +4,8 @@ import { AlertController, PickerController } from '@ionic/angular';
 import { PersonalModelService } from 'src/app/services/personal-model.service';
 import { Health } from '@awesome-cordova-plugins/health/ngx';
 
+import { AppComponent } from 'src/app/app.component';
+
 
 @Component({
   selector: 'app-settings',
@@ -39,6 +41,7 @@ export class SettingsPage implements OnInit {
 
     if (role == 'confirm') {
       this.personal_model.load_default_data();
+      AppComponent.active = true;
       this.router.navigateByUrl('pages/my-schedule');
     }
   }
@@ -64,6 +67,7 @@ export class SettingsPage implements OnInit {
 
     if (role == 'delete') {
       this.personal_model.erase_data();
+      AppComponent.active = false;
       this.router.navigateByUrl('pages/setup');
     }
   }

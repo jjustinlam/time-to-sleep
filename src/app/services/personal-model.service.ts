@@ -41,13 +41,12 @@ export class PersonalModelService {
   }
 
   async load_default_data() {
-    return;
     // TO DO: Default data
     this.erase_data();
 
     if ((await Preferences.get({key: 'has_setup'})).value === null) Preferences.set({key: 'has_setup', value: 'true'});
 
-    // Morning or night person
+    // Default user is a night person
     if ((await Preferences.get({key: 'prefers_morning'})).value === null) Preferences.set({key: 'prefers_morning', value: 'false'});
 
     // Send a notification this amount of time, in minutes, before recommended sleep time to tell the user when to begin winding down for the day
@@ -62,14 +61,14 @@ export class PersonalModelService {
     // When to wake up the user for remote asynchronous classes, in minutes
     if ((await Preferences.get({key: 'wind_up_time_async'})).value === null) Preferences.set({key: 'wind_up_time_async', value: '-1'});
 
-    // Recommended times to sleep and to wakeup by day (based on recommended overnight sleep) // TO DO
-    if ((await Preferences.get({key: 'sun'})).value === null) Preferences.set({key: 'sun', value: '23:00 - 7:00'}); // Weekend
-    if ((await Preferences.get({key: 'mon'})).value === null) Preferences.set({key: 'mon', value: '23:00 - 7:00'});
-    if ((await Preferences.get({key: 'tue'})).value === null) Preferences.set({key: 'tue', value: '23:00 - 7:00'}); // Early class
-    if ((await Preferences.get({key: 'wed'})).value === null) Preferences.set({key: 'wed', value: '23:00 - 7:00'});
-    if ((await Preferences.get({key: 'thu'})).value === null) Preferences.set({key: 'thu', value: '23:00 - 7:00'}); // Early class
-    if ((await Preferences.get({key: 'fri'})).value === null) Preferences.set({key: 'fri', value: '0:30 - 9:50'}); // "Busiest" day, most sleep needed
-    if ((await Preferences.get({key: 'sat'})).value === null) Preferences.set({key: 'sat', value: '23:00 - 7:00'}); // Weekend
+    // Recommended times to sleep and to wakeup by day (based on recommended overnight sleep)
+    if ((await Preferences.get({key: 'sun'})).value === null) Preferences.set({key: 'sun', value: '1:30 - 9:20'}); // Sun - Mon
+    if ((await Preferences.get({key: 'mon'})).value === null) Preferences.set({key: 'mon', value: '0:50 - 8:30'}); // Mon - Tue: early class
+    if ((await Preferences.get({key: 'tue'})).value === null) Preferences.set({key: 'tue', value: '2:00 - 9:30'}); // Tue - Wed
+    if ((await Preferences.get({key: 'wed'})).value === null) Preferences.set({key: 'wed', value: '0:20 - 8:10'}); // Wed - Thu: early class
+    if ((await Preferences.get({key: 'thu'})).value === null) Preferences.set({key: 'thu', value: '0:30 - 9:50'}); // Thu - Fri: "busiest" day, most sleep needed 
+    if ((await Preferences.get({key: 'fri'})).value === null) Preferences.set({key: 'fri', value: '3:00 - 11:10'}); // Fri - Sat
+    if ((await Preferences.get({key: 'sat'})).value === null) Preferences.set({key: 'sat', value: '2:30 - 11:00'}); // Sat - Sun
 
     // Set today to be Monday March 20th, 8:00 PM
     const today = new Date(2023, 2, 20, 8, 0);
@@ -81,7 +80,7 @@ export class PersonalModelService {
       return new Date(today.getFullYear(), today.getMonth(), today.getDate() - days_before, hour, min);
     };
 
-    // Courses
+    // Courses - for the sake of simplicity, assume every course is in person
     PersonalModelService.courses = [
       new Course("Comp Sci 125",  "Lec", "In person", [false,false,true ,false,true ,false,false], time_only(11, 0), time_only(12, 20)),
       new Course("Comp Sci 147",  "Lec", "In person", [false,false,true ,false,true ,false,false], time_only(9, 30), time_only(10, 50)),
@@ -91,14 +90,82 @@ export class PersonalModelService {
       new Course("I&C Sci 9",     "Stu", "In person", [false,false,false,false,false,true ,false], time_only(14, 0), time_only(16, 50)),
     ];
     
-    // Sleep data (last 2 weeks) // TO DO
+    // Sleep data (last 2 weeks = 14 entries)
     PersonalModelService.sleep_entries = [
-      new Sleep(today_offset(14, 11, 0), today_offset(13, 8, 0)),
+      new Sleep(today_offset(13,  1, 30), today_offset(13,  8, 30)), // night of Mon 3/6/2023
+      new Sleep(today_offset(12,  2,  0), today_offset(12, 10, 20)), // night of Tue 3/7/2023
+      new Sleep(today_offset(11,  1, 14), today_offset(11,  8, 32)), // night of Wed 3/8/2023
+      new Sleep(today_offset(10,  2, 27), today_offset(10, 10, 10)), // night of Thu 3/9/2023
+      new Sleep(today_offset( 9,  2, 45), today_offset( 9, 11, 12)), // night of Fri 3/10/2023
+      new Sleep(today_offset( 8,  1, 37), today_offset( 8, 11,  5)), // night of Sat 3/11/2023
+      new Sleep(today_offset( 7,  1, 42), today_offset( 7,  9, 56)), // night of Sun 3/12/2023
+      new Sleep(today_offset( 6,  0, 20), today_offset( 6,  8, 30)), // night of Mon 3/13/2023
+      new Sleep(today_offset( 5,  2, 12), today_offset( 5,  9, 33)), // night of Tue 3/14/2023
+      new Sleep(today_offset( 4,  0, 13), today_offset( 4,  8, 13)), // night of Wed 3/15/2023
+      new Sleep(today_offset( 3,  0, 34), today_offset( 3,  9, 51)), // night of Thu 3/16/2023
+      new Sleep(today_offset( 2,  3, 28), today_offset( 2, 11, 11)), // night of Fri 3/17/2023
+      new Sleep(today_offset( 1,  2, 16), today_offset( 1, 11,  3)), // night of Sat 3/18/2023
+      new Sleep(today_offset( 0,  1, 42), today_offset( 0,  9, 23)), // night of Sun 3/19/2023
     ];
 
-    // Sleepiness scores (last 2 weeks) // TO DO
+    // Sleepiness scores (last 2 weeks = 42 entries)
     PersonalModelService.sleepiness_scores = [
-
+      // Tue 3/7/2023
+      new Sleepiness(4, today_offset(13,  8, 30)), // upon wakeup
+      new Sleepiness(4, today_offset(13, 14,  0)),  // midday
+      new Sleepiness(5, today_offset(12,  2,  0)),  // before sleep
+      // Wed 3/8/2023
+      new Sleepiness(2, today_offset(12, 10, 20)), 
+      new Sleepiness(3, today_offset(12, 14,  0)), 
+      new Sleepiness(4, today_offset(11,  1, 14)), 
+      // Thu 3/9/2023
+      new Sleepiness(3, today_offset(11,  8, 32)), 
+      new Sleepiness(3, today_offset(11, 14,  0)), 
+      new Sleepiness(4, today_offset(10,  2, 27)), 
+      // Fri 3/10/2023
+      new Sleepiness(5, today_offset(10, 10, 10)), 
+      new Sleepiness(6, today_offset(10, 14,  0)), 
+      new Sleepiness(6, today_offset( 9,  2,  45)), 
+      // Sat 3/11/2023
+      new Sleepiness(3, today_offset( 9, 11, 12)), 
+      new Sleepiness(3, today_offset( 9, 14,  0)), 
+      new Sleepiness(4, today_offset( 8,  1, 37)), 
+      // Sun 3/12/2023
+      new Sleepiness(1, today_offset( 8, 11,  5)), 
+      new Sleepiness(2, today_offset( 8, 14,  0)), 
+      new Sleepiness(2, today_offset( 7,  1, 42)), 
+      // Mon 3/13/2023
+      new Sleepiness(2, today_offset( 7,  9, 56)), 
+      new Sleepiness(2, today_offset( 7, 14,  0)), 
+      new Sleepiness(2, today_offset( 6,  0, 20)), 
+      // Tue 3/14/2023
+      new Sleepiness(2, today_offset( 6,  8, 30)), 
+      new Sleepiness(3, today_offset( 6, 14,  0)), 
+      new Sleepiness(4, today_offset( 5,  2, 12)), 
+      // Wed 3/15/2023
+      new Sleepiness(3, today_offset( 5,  9, 33)), 
+      new Sleepiness(2, today_offset( 5, 14,  0)), 
+      new Sleepiness(3, today_offset( 4,  0, 13)), 
+      // Thu 3/16/2023
+      new Sleepiness(2, today_offset( 4,  8, 13)), 
+      new Sleepiness(2, today_offset( 4, 14,  0)), 
+      new Sleepiness(3, today_offset( 3,  0, 34)), 
+      // Fri 3/17/2023
+      new Sleepiness(1, today_offset( 3,  9, 51)), 
+      new Sleepiness(1, today_offset( 3, 14,  0)), 
+      new Sleepiness(2, today_offset( 2,  3, 28)), 
+      // Sat 3/18/2023
+      new Sleepiness(2, today_offset( 2, 11, 11)), 
+      new Sleepiness(1, today_offset( 2, 14,  0)), 
+      new Sleepiness(4, today_offset( 1,  2, 16)), 
+      // Sun 3/19/2023
+      new Sleepiness(2, today_offset( 1, 11,  3)), 
+      new Sleepiness(1, today_offset( 1, 14,  0)), 
+      new Sleepiness(3, today_offset( 0,  1, 42)), 
+      // Mon 3/8/2023 (today)
+      new Sleepiness(3, today_offset( 0,  9, 23)), 
+      new Sleepiness(3, today_offset( 0, 14,  0)), 
+      // new Sleepiness(5, today_offset(-1,  ?,  ?)), // TO BE RECORDED AT DEMO TIME
     ];
 
   }
@@ -360,6 +427,21 @@ export class PersonalModelService {
     return when;
   }
 
+  // Returns true if the day and time given conflicts (overlaps) with a course in the user's course schedule
+  async is_time_conflict(day:string, hour:number, min:number, include_wind_up:boolean=true) {
+    var timestamp = hour * 60 + min;
+
+    var courses = this.get_courses_by_day(day.toLowerCase());
+    for (var i = 0; i < courses.length; i++) {
+      var start = courses[i].time_start.getHours() * 60 + courses[i].time_start.getMinutes();
+      if (include_wind_up) start += await this.wind_up_time();
+      var end = courses[i].time_end.getHours() * 60 + courses[i].time_end.getMinutes();
+
+      if (timestamp >= start && timestamp <= end) return true;
+    }
+    return false;
+  }
+
   // Shift sleep for day:string by minutes:number. Positive values shift it forward.
   // e.g. shift_sleep('mon', 30) could shift it from 10:30pm to 11:00pm
   // Returns false on failure (e.g. conflict with class)
@@ -475,9 +557,9 @@ export class PersonalModelService {
   }
 
   // Retrieve all courses that take place on a given day.
-  async get_courses_by_day(day:string) {
+  get_courses_by_day(day:string) {
     var arr:Course[] = [];
-    var index = PersonalModelService.day_labels.findIndex((elm) => { return elm == day });
+    var index = PersonalModelService.day_labels.findIndex((elm) => { return elm == day.toLowerCase() });
     for (var i = 0; i < PersonalModelService.courses.length; i++) {
       var course = PersonalModelService.courses[i];
       if (course.days[index]) arr.push(course);
@@ -521,7 +603,7 @@ export class PersonalModelService {
   // Retrieves the average sleepiness score for a given day.
   async get_sleepiness_avg(day:string) {
     var arr:Sleepiness[] = PersonalModelService.sleepiness_scores.filter((sleepiness) => {
-      return sleepiness.day == day;
+      return sleepiness.day == day.toLowerCase();
     });
 
     var total = 0;
