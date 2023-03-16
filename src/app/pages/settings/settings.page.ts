@@ -13,11 +13,18 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./settings.page.scss'],
 })
 export class SettingsPage implements OnInit {
-  wind_up_time:number;
+  sleep_preference:string;
 
   constructor(private personal_model: PersonalModelService, private alertController:AlertController, private pickerController:PickerController, private router:Router, private health: Health) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    var prefers_morning = await this.personal_model.prefers_morning();
+    if (prefers_morning) this.sleep_preference = "morning";
+    else this.sleep_preference = "night";
+  }
+
+  get prefers_morning() {
+    return this.personal_model.prefers_morning();
   }
 
   async load_default_data() {
@@ -44,6 +51,13 @@ export class SettingsPage implements OnInit {
       AppComponent.active = true;
       this.router.navigateByUrl('pages/my-schedule');
     }
+  }
+
+  async swap_preference() {
+    if (this.sleep_preference == 'morning') this.sleep_preference = 'night';
+    else this.sleep_preference = 'morning';
+
+    this.personal_model.set_prefers_morning(this.sleep_preference == 'morning');
   }
 
   async clear_data() {
@@ -113,7 +127,7 @@ export class SettingsPage implements OnInit {
         {
           text: 'Confirm',
           handler: (picked) => {
-            this.wind_up_time = picked.hours.value * 60 + picked.minutes.value;
+            this.personal_model.set_wind_up_time(picked.hours.value * 60 + picked.minutes.value);
           }
         }
       ]

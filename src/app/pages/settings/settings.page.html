@@ -12,9 +12,10 @@
   <ion-card>
     <ion-card-content>
       <ion-item>
-        <ion-label>You are a morning person</ion-label> <!-- TO DO: Change to morning or night person based on what's in the database (check in ngInit())-->
-        <ion-button slot="end">
-          <ion-icon name="sunny"></ion-icon>
+        <ion-label>You are a {{sleep_preference}} person</ion-label> <!-- TO DO: Change to morning or night person based on what's in the database (check in ngInit())-->
+        <ion-button (click)="swap_preference()" slot="end">
+          <ion-icon *ngIf="sleep_preference == 'morning'" name="sunny"></ion-icon>
+          <ion-icon *ngIf="sleep_preference == 'night'" name="moon"></ion-icon>
         </ion-button>
       </ion-item>
     </ion-card-content>
@@ -36,7 +37,7 @@
       <ion-item>
         <ion-label>Connect your fitness app</ion-label>
         <ion-button (click)="connect_fitness()" slot="end">
-          <ion-icon name="arrow-forward"></ion-icon> <!-- TO DO: Fitness app integration (if integrated, give open to disconnect fitness app instead)-->
+          <ion-icon name="arrow-forward"></ion-icon>
         </ion-button>
       </ion-item>
     </ion-card-content>
@@ -48,7 +49,7 @@
       <ion-item>
         <ion-label>Add static data</ion-label>
         <ion-button (click)="load_default_data()" slot="end">
-          <ion-icon name="clipboard"></ion-icon> <!-- TO DO: Integrate static data -->
+          <ion-icon name="clipboard"></ion-icon> 
         </ion-button>
       </ion-item>
     </ion-card-content>

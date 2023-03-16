@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PersonalModelService } from 'src/app/services/personal-model.service';
-import { Health } from '@awesome-cordova-plugins/health/ngx';
+import { Health, HealthData } from '@awesome-cordova-plugins/health/ngx';
+import { Sleep } from 'src/app/data/sleep';
 
 @Component({
   selector: 'app-overnight-sleep',
@@ -11,7 +12,7 @@ import { Health } from '@awesome-cordova-plugins/health/ngx';
 
 export class OvernightSleepPage implements OnInit {
   wakeup_time: Date;
-  sleep: string = "Error retrieving sleep data"; // placeholder text if unable to retrieve health data
+  // sleep: string = "Error retrieving sleep data"; // placeholder text if unable to retrieve health data
 
   constructor(private personal_model: PersonalModelService, private health: Health) {
   }
@@ -56,19 +57,46 @@ export class OvernightSleepPage implements OnInit {
       dataType: 'sleep',
       limit: 1000
     }).then(data => {
+      
+      var sleepData = data.filter((datum) => {
+        return ["sleep", "sleep.light", "sleep.deep", "sleep.rem"].includes(datum.value);
+      }).sort((a:HealthData, b:HealthData) => {
+        return (new Date(a.startDate).valueOf() - new Date(b.startDate).valueOf());
+      });
 
-      let sleepData = data.reduce((total, data) => {
-        if (["sleep", "sleep.light", "sleep.deep", "sleep.rem"].includes(data.value)) {
-          const sleepStart = new Date(data.startDate);
-          const sleepEnd = new Date(data.endDate);
-          const sleepDuration = sleepEnd.getTime() - sleepStart.getTime();
-          return total + sleepDuration;
-        }
-        return total;
-      }, 0);
-      console.log(sleepData);
-      this.sleep = this.formatTime(sleepData);
+      if (sleepData.length > 0) {
+        var sleep = new Sleep(sleepData[0].startDate, sleepData[sleepData.length-1].endDate);
+        PersonalModelService.sleep_entries.push(sleep);
+      }
+
+      // let sleepData = data.reduce((total, data) => {
+      //   if (["sleep", "sleep.light", "sleep.deep", "sleep.rem"].includes(data.value)) {
+      //     const sleepStart = new Date(data.startDate);
+      //     const sleepEnd = new Date(data.endDate);
+      //     const sleepDuration = sleepEnd.getTime() - sleepStart.getTime();
+      //     return total + sleepDuration;
+      //   }
+      //   return total;
+      // }, 0);
+      // console.log(sleepData);
+      // this.sleep = this.formatTime(sleepData);
     })
+  }
+
+  get last_sleep_date() {
+    var last_sleep = this.personal_model.get_last_sleep();
+    if (last_sleep) return last_sleep.time_sleep_as_str();
+    else return "";
+  }
+
+  get last_sleep_duration() {
+    var last_sleep = this.personal_model.get_last_sleep();
+    if (last_sleep) return last_sleep.duration_as_str();
+    else return "No recorded data"
+  }
+
+  get all_sleep_entries() {
+    return PersonalModelService.sleep_entries.reverse();
   }
 
   async recommended_wakeup_time() {

@@ -12,23 +12,46 @@
   <ion-card>
     <ion-card-content id="alarm-card">
       <p>We set an alarm for</p>
-      <h1><strong>{{wakeup_time_str}}</strong></h1> <!-- TO DO: Change to tomorrow's recommended alarm time OR user's overriden alarm time (if applicable)-->
+      <h1><strong>{{wakeup_time_str}}</strong></h1>
       <p>({{time_from_now}})</p>
-      <ion-button slot="end"> <!-- TO DO: (click)="set_manual_alarm()" -->
+      <!-- TO DO: (click)="set_manual_alarm()" -->
+      <!-- <ion-button slot="end"> 
         <ion-icon slot="start" name="pencil"></ion-icon>
         <ion-label>Set manually</ion-label>
-      </ion-button>
+      </ion-button> -->
     </ion-card-content>
   </ion-card>
 
   <h1>Your sleep in the last day</h1>
   <ion-card>
     <ion-card-content>
-      <!-- TO DO: Change to yesterday's sleep length  -->
-      <!-- has a default error message, need to fix sleep data retrieval -->
-      <ion-label> {{ sleep }} </ion-label>
-      <ion-icon slot="end" name="arrow-forward"></ion-icon>
+      <h1>{{last_sleep_date}}</h1>
+      <p>{{last_sleep_duration}}</p>
     </ion-card-content>
   </ion-card>
-  <ion-button>See more</ion-button> <!-- TO DO: Create page modal to scroll through (retrieve) entries from database in reverse date order (recent first) -->
+  <ion-button id="open-sleep-entries-modal">See more</ion-button> 
+
+  <ion-modal trigger="open-sleep-entries-modal" [initialBreakpoint]="0.9" [breakpoints]="[0, 0.9]">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Your recent sleep entries</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-card *ngFor="let entry of all_sleep_entries">
+          <ion-card-content>
+            <h1>{{entry.time_sleep_as_str()}}</h1>
+            <p>{{entry.duration_as_str()}}</p>
+          </ion-card-content>
+        </ion-card>
+        <ion-card *ngIf="all_sleep_entries.length < 1">
+          <ion-card-content>
+            <p>No recorded data</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>

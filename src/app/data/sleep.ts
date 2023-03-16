@@ -10,7 +10,7 @@ export class Sleep {
 	}
 
 	get day():string {
-		if (this.time_sleep.getHours() < 8) return PersonalModelService.day_labels[(this.time_sleep.getDay() - 1) % 7];
+		if (this.time_sleep.getHours() < 5) return PersonalModelService.day_labels[(this.time_sleep.getDay() - 1) % 7];
 		else return PersonalModelService.day_labels[this.time_sleep.getDay()];
 	}
 
@@ -29,5 +29,13 @@ export class Sleep {
 
 		if (hours < 1) return `${minutes} minutes`;
 		else return `${hours} hours, ${minutes} minutes`;
+	}
+
+	time_sleep_as_str():string {
+		if (this.time_sleep.getHours() < 5) {
+			var yesterday = new Date(this.time_sleep);
+			yesterday.setDate(yesterday.getDate() - 1);
+			return yesterday.toDateString();
+		} else return this.time_sleep.toDateString();
 	}
 }

@@ -8,14 +8,24 @@
 </ion-header>
 
 <ion-content id="container">
-    <h1>Your typical sleepiness alertness on Wednesdays</h1> <!-- TO DO: Retrieve typical sleep on today's day -->
-    <div class="row">
-      <ion-icon class="ion-padding" name="battery-half" color="success"></ion-icon> <!-- TO DO: Change icon between battery-full, battery-half, and battery-empty based on alertness levels -->
-      <p class=" ion-padding huge-text">7</p>
+    <h1>Your typical sleepiness alertness on {{weekday}}s</h1>
+    <div *ngIf="avg_sleepiness != -1">
+      <div class="row">
+        <!-- most awake >> 1 2 | 3 4 5 | 6 7 << most sleepy-->
+        <ion-icon *ngIf="avg_sleepiness > 5 && avg_sleepiness <= 7" class="ion-padding" name="battery-empty" color="danger"></ion-icon>
+        <ion-icon *ngIf="avg_sleepiness > 2 && avg_sleepiness <= 5" class="ion-padding" name="battery-half" color="warning"></ion-icon>
+        <ion-icon *ngIf="avg_sleepiness >= 1 && avg_sleepiness <= 2" class="ion-padding" name="battery-full" color="success"></ion-icon> 
+        <p class=" ion-padding huge-text">{{avg_sleepiness.toFixed(2)}}</p>
+      </div>
+      <p>from an average of</p>
+      <p>{{avg_sleep_duration_str}}</p>
+      <p>of sleep the night before</p>
     </div>
-    <p>from an average of</p>
-    <p>8 hours 10 minutes</p>
-    <p>of sleep on Tuesday nights</p>
+    <div *ngIf="avg_sleepiness == -1">
+      <div class="row">
+        <p>No recorded data</p>
+      </div>
+    </div>
 </ion-content>
 
 <div id="fixed-bottom">

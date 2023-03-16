@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Course } from '../data/course';
 import { SQLiteService } from './sqlite.service';
 import { Preferences } from '@capacitor/preferences';
-import { AppComponent } from '../app.component';
+// import { AppComponent } from '../app.component';
 import { Sleep } from '../data/sleep';
 import { Sleepiness } from '../data/sleepiness';
 
@@ -177,7 +177,7 @@ export class PersonalModelService {
     PersonalModelService.courses = [];
     PersonalModelService.sleep_entries = [];
     PersonalModelService.sleepiness_scores = [];
-    AppComponent.active = false;
+    // AppComponent.active = false;
     this.sqlite.hard_reset();
   }
 
@@ -258,6 +258,10 @@ export class PersonalModelService {
   async prefers_morning():Promise<boolean> {
     const { value } = await Preferences.get({key: 'prefers_morning'});
     return value == 'true';
+  }
+
+  set_prefers_morning(prefers_morning:boolean) {
+    Preferences.set({key: 'prefers_morning', value: `${prefers_morning}`})
   }
 
   // Returns the (const) value for when we send a notifcation before the recommended sleep time
@@ -574,13 +578,13 @@ export class PersonalModelService {
   }
 
   // Retrieves the most recent sleep entry. Assume sleep_entries is kept in chronological order.
-  async get_last_sleep() {
-    if (PersonalModelService.sleep_entries.length) return PersonalModelService.sleep_entries[PersonalModelService.length-1];
+  get_last_sleep() {
+    if (PersonalModelService.sleep_entries.length) return PersonalModelService.sleep_entries[PersonalModelService.sleep_entries.length-1];
     else return null;
   }
 
-  // Retrieves the average sleep duration for a given day.
-  async get_sleep_duration_avg(day:string) {
+  // Retrieves the average sleep duration (in minutes) for a given day.
+  get_sleep_duration_avg(day:string) {
     var arr:Sleep[] = PersonalModelService.sleep_entries.filter((sleep) => {
       return sleep.day == day;
     });
@@ -592,16 +596,16 @@ export class PersonalModelService {
 
     if (total > 0) return total / arr.length;
     else return -1;
-  }
+  }  
 
   // Adds a sleepiness score to sleepiness scores list. Assume sleepiness_scores is kept in chronological order.
-  async add_sleepiness(sleepiness:Sleepiness) {
+  add_sleepiness(sleepiness:Sleepiness) {
     PersonalModelService.sleepiness_scores.push(sleepiness);
     this.sqlite.insertSleepiness(sleepiness);
   }
 
   // Retrieves the average sleepiness score for a given day.
-  async get_sleepiness_avg(day:string) {
+  get_sleepiness_avg(day:string) {
     var arr:Sleepiness[] = PersonalModelService.sleepiness_scores.filter((sleepiness) => {
       return sleepiness.day == day.toLowerCase();
     });
@@ -613,6 +617,33 @@ export class PersonalModelService {
 
     if (total > 0) return total / arr.length;
     else return -1;
+  }
+
+  get_single_day_sleepiness(when?:Date) {
+    var today:Date;
+    var day:string;
+    if (when) {
+      today = when;
+      day = PersonalModelService.day_labels[when.getDay()];
+    }
+    else {
+      today = new Date();
+      day = PersonalModelService.day_labels[today.getDay()];
+    }
+    var tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    var compare = function(a: Date, b: Date) {
+      return a.getFullYear() == b.getFullYear() && a.getMonth() == b.getMonth() && a.getDate() == b.getDate();
+    }
+
+
+    return PersonalModelService.sleepiness_scores.filter((sleepiness) => {
+      return (
+        sleepiness.day == day 
+        && (compare(sleepiness.date, today) || compare(sleepiness.date, tomorrow))
+      );
+    });
   }
 
   // Change the time needed to wind up
