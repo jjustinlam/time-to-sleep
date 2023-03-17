@@ -6,3 +6,15 @@
 	// top: 50%;
 	// transform: translateY(-50%);
 }
+
+#stop {
+	--background: darkred;
+	--background-hover: darkred;
+	--color: white;
+}
+
+#start {
+	--background: green;
+	--background-hover: green;
+	--color: white;
+}

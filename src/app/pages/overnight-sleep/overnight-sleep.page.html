@@ -22,7 +22,19 @@
     </ion-card-content>
   </ion-card>
 
-  <h1>Your sleep in the last day</h1>
+  <ion-card class="ion-padding">
+    <ion-card-header>
+      <ion-card-title *ngIf="!is_running">Start a sleep session manually</ion-card-title>
+      <ion-card-title *ngIf="is_running">{{elapsed()}}</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-button *ngIf="!is_running" id="start" (click)="start()">Start</ion-button>
+      <ion-button *ngIf="is_running" id="stop" (click)="stop()">Stop</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <h1>Your last sleep</h1>
   <ion-card>
     <ion-card-content>
       <h1>{{last_sleep_date}}</h1>

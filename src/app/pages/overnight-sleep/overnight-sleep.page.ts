@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PersonalModelService } from 'src/app/services/personal-model.service';
 import { Health, HealthData } from '@awesome-cordova-plugins/health/ngx';
 import { Sleep } from 'src/app/data/sleep';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-overnight-sleep',
@@ -12,9 +13,12 @@ import { Sleep } from 'src/app/data/sleep';
 
 export class OvernightSleepPage implements OnInit {
   wakeup_time: Date;
+  time_start:Date;
+  is_running:boolean = false;
+  timer:any = null;
   // sleep: string = "Error retrieving sleep data"; // placeholder text if unable to retrieve health data
 
-  constructor(private personal_model: PersonalModelService, private health: Health) {
+  constructor(private personal_model: PersonalModelService, private health: Health, private alertController:AlertController) {
   }
 
   async ngOnInit() {
@@ -99,6 +103,24 @@ export class OvernightSleepPage implements OnInit {
     return PersonalModelService.sleep_entries.reverse();
   }
 
+  get wakeup_time_str() {
+    return new Date(this.wakeup_time).toLocaleTimeString('en-US', { timeStyle: 'short' });
+  }
+
+  get time_from_now() {
+    if (this.wakeup_time) {
+      var now = new Date();
+
+      var diff = this.wakeup_time.valueOf() - now.valueOf();
+      var hours = Math.floor(diff / (1000 * 60 * 60));
+      var minutes = Math.floor(diff / (1000 * 60)) % 60;
+
+      if (hours > 1) return `in ${hours} hours`;
+      else if (hours > 0) return `in ${hours} hour`;
+      else return `in <1 hour`;
+    } else return 'in -1 hours';
+  }
+
   async recommended_wakeup_time() {
     // const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     // var date = new Date();
@@ -131,22 +153,75 @@ export class OvernightSleepPage implements OnInit {
     return await this.personal_model.when_to_sleep();
   }
 
-  get wakeup_time_str() {
-    return new Date(this.wakeup_time).toLocaleTimeString('en-US', { timeStyle: 'short' });
+  elapsed():string {
+    if (!this.is_running) return "0:00:00";
+
+    var current:Date = new Date();
+    var elapsed:Date = new Date(current.getTime() - this.time_start.getTime());
+
+    var hour = elapsed.getUTCHours().toString();
+		var min = elapsed.getUTCMinutes().toString().padStart(2, '0');
+		var sec = elapsed.getUTCSeconds().toString().padStart(2, '0');
+
+		return hour + ':' + min + ':' + sec;
   }
 
-  get time_from_now() {
-    if (this.wakeup_time) {
-      var now = new Date();
+  async start() {
+    const alert = await this.alertController.create({
+      header: 'Start a sleep session?',
+      buttons: [
+        {
+          text: 'Not yet',
+          role: 'cancel'
+        },
+        {
+          text: 'Good night!',
+          role: 'confirm'
+        }
+      ]
+    });
 
-      var diff = this.wakeup_time.valueOf() - now.valueOf();
-      var hours = Math.floor(diff / (1000 * 60 * 60));
-      var minutes = Math.floor(diff / (1000 * 60)) % 60;
+    await alert.present();
 
-      if (hours > 1) return `in ${hours} hours`;
-      else if (hours > 0) return `in ${hours} hour`;
-      else return `in <1 hour`;
-    } else return 'in -1 hours';
+    const { role } = await alert.onDidDismiss();
+
+    if (role == 'confirm') {
+      if (this.is_running) return;
+      this.is_running = true;
+
+      this.time_start = new Date();
+      this.timer = setInterval(this.elapsed.bind(this), 1000);
+    }
+  }
+
+  async stop() {
+    const alert = await this.alertController.create({
+      header: 'End your sleep session?',
+      buttons: [
+        {
+          text: 'Still sleeping',
+          role: 'cancel'
+        },
+        {
+          text: 'Good morning!',
+          role: 'confirm'
+        }
+      ]
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+
+    if (role == 'confirm') {
+      if (!this.is_running) return;
+      this.is_running = false;
+
+      var sleep = new Sleep(this.time_start, new Date());
+      this.personal_model.add_sleep(sleep);
+
+      clearInterval(this.timer);
+    }
   }
 
 }

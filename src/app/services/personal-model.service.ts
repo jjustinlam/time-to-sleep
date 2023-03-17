@@ -34,9 +34,11 @@ export class PersonalModelService {
 
   constructor(private sqlite:SQLiteService) { 
     // this.set_default_preferences();
-    if (PersonalModelService.loadDefaultData) {
-      this.load_default_data();
-    }
+    if (PersonalModelService.courses.length < 1) this.load_courses();
+    if (PersonalModelService.sleep_entries.length < 1) this.load_sleep_entries();
+    if (PersonalModelService.sleepiness_scores.length < 1) this.load_sleepiness_scores();
+
+    if (PersonalModelService.loadDefaultData) this.load_default_data();
     PersonalModelService.loadDefaultData = false;
   }
 
@@ -463,8 +465,13 @@ export class PersonalModelService {
       }
       sleep_hour += (Math.floor(Math.abs(minutes) / 60) * Math.sign(minutes)) % 24;
 
-      Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${wakeup_hour}:${wakeup_min}`});
-    } else console.log('Could not change sleep time');
+      if (await this.is_time_conflict(day, sleep_hour, sleep_min)) return false;
+      else Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${wakeup_hour}:${wakeup_min}`});
+
+    } else {
+      console.log('Could not change sleep time');
+      return false;
+    }
     return true;
   }
 
@@ -477,8 +484,14 @@ export class PersonalModelService {
       var [sleep_hour, sleep_min] = sleep_time.split(':').map(Number);
       var [wakeup_hour, wakeup_min] = wakeup_time.split(':').map(Number);
 
-      Preferences.set({key: day.toLowerCase(), value: `${hour}:${min} - ${wakeup_hour}:${wakeup_min}`});
-    } else console.log('Could not change sleep time');
+      if (await this.is_time_conflict(day, sleep_hour, sleep_min)) return false;
+      else Preferences.set({key: day.toLowerCase(), value: `${hour}:${min} - ${wakeup_hour}:${wakeup_min}`});
+
+    } else {
+      console.log('Could not change sleep time');
+      return false;
+    }
+    return true;
   }
 
   // Shift wakeup for day:string by minutes:number. Positive values shift it forward.
@@ -498,8 +511,14 @@ export class PersonalModelService {
       }
       wakeup_hour += (Math.floor(Math.abs(minutes) / 60) * Math.sign(minutes)) % 24;
 
-      Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${wakeup_hour}:${wakeup_min}`});
-    } else console.log('Could not change wakeup time');
+      if (await this.is_time_conflict(day, wakeup_hour, wakeup_min)) return false;
+      else Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${wakeup_hour}:${wakeup_min}`});
+
+    } else {
+      console.log('Could not change wakeup time');
+      return false;
+    }
+    return true;
   }
 
   // Set the sleep time manually for day:string
@@ -508,11 +527,17 @@ export class PersonalModelService {
     const { value } = await Preferences.get({key: day.toLowerCase()});
     if (value) {
       var [sleep_time, wakeup_time] = value.split(' - ');
-      var [sleep_hour, sleep_min] = sleep_time.split(':');
-      var [wakeup_hour, wakeup_min] = wakeup_time.split(':');
+      var [sleep_hour, sleep_min] = sleep_time.split(':').map(Number);
+      var [wakeup_hour, wakeup_min] = wakeup_time.split(':').map(Number);
 
-      Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${hour}:${min}`});
-    } else console.log('Could not change wakeup time');
+      if (await this.is_time_conflict(day, wakeup_hour, wakeup_min)) return false;
+      else Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${hour}:${min}`});
+
+    } else {
+      console.log('Could not change wakeup time');
+      return false;
+    }
+    return true;
   }
 
   // Get the duration of sleep recommended from sleep time to wakeup time
