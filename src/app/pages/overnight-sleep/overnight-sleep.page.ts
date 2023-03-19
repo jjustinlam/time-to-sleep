@@ -12,7 +12,8 @@ import { AlertController } from '@ionic/angular';
 
 
 export class OvernightSleepPage implements OnInit {
-  wakeup_time: Date;
+  sleep_time:Date;
+  wakeup_time:Date;
   time_start:Date;
   is_running:boolean = false;
   timer:any = null;
@@ -24,7 +25,8 @@ export class OvernightSleepPage implements OnInit {
   async ngOnInit() {
     if (PersonalModelService.sleep_entries.length < 1) this.personal_model.load_sleep_entries();
 
-    this.wakeup_time = await this.recommended_wakeup_time();
+    this.sleep_time = await this.personal_model.when_to_sleep();
+    this.wakeup_time = await this.personal_model.when_to_wakeup();
 
     this.health.isAvailable().then((available: boolean) => {
       console.log(available);
@@ -107,7 +109,25 @@ export class OvernightSleepPage implements OnInit {
     return new Date(this.wakeup_time).toLocaleTimeString('en-US', { timeStyle: 'short' });
   }
 
-  get time_from_now() {
+  get sleep_time_str() {
+    return new Date(this.sleep_time).toLocaleTimeString('en-US', { timeStyle: 'short'});
+  }
+
+  get sleep_from_now() {
+    if (this.sleep_time) {
+      var now = new Date();
+
+      var diff = this.sleep_time.valueOf() - now.valueOf();
+      var hours = Math.floor(diff / (1000 * 60 * 60));
+      var minutes = Math.floor(diff / (1000 * 60)) % 60;
+
+      if (hours > 1) return `in ${hours} hours`;
+      else if (hours > 0) return `in ${hours} hour`;
+      else return `in ${minutes} minutes`;
+    } else return 'in -1 hours';
+  }
+
+  get wakeup_from_now() {
     if (this.wakeup_time) {
       var now = new Date();
 
@@ -117,41 +137,41 @@ export class OvernightSleepPage implements OnInit {
 
       if (hours > 1) return `in ${hours} hours`;
       else if (hours > 0) return `in ${hours} hour`;
-      else return `in <1 hour`;
+      else return `in ${minutes} minutes`;
     } else return 'in -1 hours';
   }
 
-  async recommended_wakeup_time() {
-    // const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-    // var date = new Date();
-    // var recommended = await this.personal_model.today(weekdays[date.getDay()]);
+  // async recommended_wakeup_time() {
+  //   // const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  //   // var date = new Date();
+  //   // var recommended = await this.personal_model.today(weekdays[date.getDay()]);
 
-    // var sleep = (recommended.sleep.hour) * 60 + (recommended.sleep.min);
-    // var wakeup = (recommended.wakeup.hour) * 60 + (recommended.wakeup.min);
+  //   // var sleep = (recommended.sleep.hour) * 60 + (recommended.sleep.min);
+  //   // var wakeup = (recommended.wakeup.hour) * 60 + (recommended.wakeup.min);
 
-    // if (sleep > wakeup) {
-    //   // e.g. 23:00 - 8:00
-    //   date.setDate(date.getDate() + 1);
-    // } else {
-    //   // e.g. 0:00 - 9:00, extreme case 1:00 - 1:00
-    // }
-    // date.setHours(recommended.wakeup.hour);
-    // date.setMinutes(recommended.wakeup.min);
-    // return date;
-    return await this.personal_model.when_to_wakeup();
-  }
+  //   // if (sleep > wakeup) {
+  //   //   // e.g. 23:00 - 8:00
+  //   //   date.setDate(date.getDate() + 1);
+  //   // } else {
+  //   //   // e.g. 0:00 - 9:00, extreme case 1:00 - 1:00
+  //   // }
+  //   // date.setHours(recommended.wakeup.hour);
+  //   // date.setMinutes(recommended.wakeup.min);
+  //   // return date;
+  //   return await this.personal_model.when_to_wakeup();
+  // }
 
-  async recommended_sleep_time() {
-    // const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-    // var date = new Date();
-    // var recommended = await this.personal_model.today(weekdays[date.getDay()]);
+  // async recommended_sleep_time() {
+  //   // const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  //   // var date = new Date();
+  //   // var recommended = await this.personal_model.today(weekdays[date.getDay()]);
 
-    // date.setDate(date.getDate() + 1);
-    // date.setHours(recommended.sleep.hour);
-    // date.setMinutes(recommended.sleep.min);
-    // return date;
-    return await this.personal_model.when_to_sleep();
-  }
+  //   // date.setDate(date.getDate() + 1);
+  //   // date.setHours(recommended.sleep.hour);
+  //   // date.setMinutes(recommended.sleep.min);
+  //   // return date;
+  //   return await this.personal_model.when_to_sleep();
+  // }
 
   elapsed():string {
     if (!this.is_running) return "0:00:00";

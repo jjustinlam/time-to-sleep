@@ -11,10 +11,10 @@
     <h1>Your typical sleepiness alertness on {{weekday}}s</h1>
     <div *ngIf="avg_sleepiness != -1">
       <div class="row">
-        <!-- most awake >> 1 2 | 3 4 5 | 6 7 << most sleepy-->
+        <!-- most awake >> 1 2 3 | 4 5 | 6 7 << most sleepy-->
         <ion-icon *ngIf="avg_sleepiness > 5 && avg_sleepiness <= 7" class="ion-padding" name="battery-empty" color="danger"></ion-icon>
-        <ion-icon *ngIf="avg_sleepiness > 2 && avg_sleepiness <= 5" class="ion-padding" name="battery-half" color="warning"></ion-icon>
-        <ion-icon *ngIf="avg_sleepiness >= 1 && avg_sleepiness <= 2" class="ion-padding" name="battery-full" color="success"></ion-icon> 
+        <ion-icon *ngIf="avg_sleepiness > 3 && avg_sleepiness <= 5" class="ion-padding" name="battery-half" color="warning"></ion-icon>
+        <ion-icon *ngIf="avg_sleepiness >= 1 && avg_sleepiness <= 3" class="ion-padding" name="battery-full" color="success"></ion-icon> 
         <p class=" ion-padding huge-text">{{avg_sleepiness.toFixed(2)}}</p>
       </div>
       <p>from an average of</p>
@@ -52,7 +52,7 @@
         </ion-card-header>
       </ion-card>
 
-      <ion-range [(ngModel)]="logged_value" [ticks]="true" [snaps]="true" [min]="1" [max]="7" [pin]="true" [pinFormatter]="pin_formatter">
+      <ion-range [(ngModel)]="last_logged_value" [ticks]="true" [snaps]="true" [min]="1" [max]="7" [pin]="true" [pinFormatter]="pin_formatter">
         <ion-icon name="sunny" slot="start"></ion-icon>
         <ion-icon name="moon" slot="end"></ion-icon>
       </ion-range>

@@ -11,9 +11,11 @@
   <h1>Recommended sleep</h1>
   <ion-card>
     <ion-card-content id="alarm-card">
-      <p>We set an alarm for</p>
-      <h1><strong>{{wakeup_time_str}}</strong></h1>
-      <p>({{time_from_now}})</p>
+      <p>We recommend that you sleep at</p>
+      <h1><strong>{{sleep_time_str}}</strong> ({{sleep_from_now}})</h1>
+      <p>and wakeup tomorrow at</p>
+      <h1><strong>{{wakeup_time_str}}</strong> ({{wakeup_from_now}})</h1>
+      <!-- <p>({{time_from_now}})</p> -->
       <!-- TO DO: (click)="set_manual_alarm()" -->
       <!-- <ion-button slot="end"> 
         <ion-icon slot="start" name="pencil"></ion-icon>

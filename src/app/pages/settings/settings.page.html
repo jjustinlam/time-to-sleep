@@ -57,6 +57,16 @@
   <ion-card>
     <ion-card-content>
       <ion-item>
+        <ion-label text-wrap>See recommended sleep & wakeup times</ion-label>
+        <ion-button (click)="show_recommendation_data()" slot="end">
+          <ion-icon name="alarm"></ion-icon> 
+        </ion-button>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-content>
+      <ion-item>
         <ion-label>Clear data</ion-label>
         <ion-button (click)="clear_data()" slot="end">
           <ion-icon name="nuclear"></ion-icon>

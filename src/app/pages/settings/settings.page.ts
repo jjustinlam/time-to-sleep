@@ -53,6 +53,31 @@ export class SettingsPage implements OnInit {
     }
   }
 
+  async show_recommendation_data() {
+    var messages:string[] = [];
+
+    for (var i = 0; i < PersonalModelService.day_labels.length; i++) {
+      var day = PersonalModelService.day_labels[i];
+      var sleep = await this.personal_model.get_sleep_time(day);
+      var wakeup = await this.personal_model.get_wakeup_time(day);
+      
+      var pad = function(n:number) {
+        return String(n).padStart(2, '0')
+      };
+
+      messages.push(`<p>${day.toUpperCase()}:\t${pad(sleep.hour)}:${pad(sleep.min)} to ${pad(wakeup.hour)}:${pad(wakeup.min)}</p>`);
+    }
+
+    const alert = await this.alertController.create({
+      header: "Recommended sleep & wakeup times for days in the week",
+      message: messages.join(''),
+      buttons: ['Dismiss']
+    });
+
+    await alert.present();
+
+  }
+
   async swap_preference() {
     if (this.sleep_preference == 'morning') this.sleep_preference = 'night';
     else this.sleep_preference = 'morning';

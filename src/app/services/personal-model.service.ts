@@ -6,6 +6,8 @@ import { Preferences } from '@capacitor/preferences';
 import { Sleep } from '../data/sleep';
 import { Sleepiness } from '../data/sleepiness';
 
+import { Modulo } from '../data/modulo';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,6 +18,9 @@ export class PersonalModelService {
   public static courses:Course[] = [];
   public static sleep_entries:Sleep[] = [];
   public static sleepiness_scores:Sleepiness[] = [];
+
+  public static scores_today:Sleepiness[] = [];
+  public static last_logged_day:string;
 
   // public static has_setup = false;
   // public static prefers_morning = false;
@@ -165,8 +170,8 @@ export class PersonalModelService {
       new Sleepiness(1, today_offset( 1, 14,  0)), 
       new Sleepiness(3, today_offset( 0,  1, 42)), 
       // Mon 3/8/2023 (today)
-      new Sleepiness(3, today_offset( 0,  9, 23)), 
-      new Sleepiness(3, today_offset( 0, 14,  0)), 
+      // new Sleepiness(3, today_offset( 0,  9, 23)), 
+      // new Sleepiness(3, today_offset( 0, 14,  0)), 
       // new Sleepiness(5, today_offset(-1,  ?,  ?)), // TO BE RECORDED AT DEMO TIME
     ];
 
@@ -380,13 +385,13 @@ export class PersonalModelService {
     if (day) {
       summary = await this.today(day.toLowerCase());
     } else {
-      summary = await this.today(PersonalModelService.day_labels[(when.getDay()) % 7]);
+      summary = await this.today(PersonalModelService.day_labels[when.getDay()]);
 
       var now = (when.getHours()) * 60 + (when.getMinutes());
       var sleep = (summary.sleep.hour) * 60 + (summary.sleep.min);
 
       // e.g. now is 12:01am and sleep is 2am
-      if (now <= sleep) summary = await this.today(PersonalModelService.day_labels[(when.getDay()-1) % 7]);
+      if (now <= sleep) summary = await this.today(PersonalModelService.day_labels[Modulo.mod(when.getDay()-1, 7)]);
       else when.setDate(when.getDate() + 1);
     }
 
@@ -404,13 +409,13 @@ export class PersonalModelService {
     if (day) {
       summary = await this.today(day.toLowerCase());
     } else {
-      summary = await this.today(PersonalModelService.day_labels[(when.getDay()) % 7]);
+      summary = await this.today(PersonalModelService.day_labels[when.getDay()]);
     
       var now = (when.getHours()) * 60 + (when.getMinutes());
       var wakeup = (summary.wakeup.hour) * 60 + (summary.wakeup.min);
 
       // e.g. now is 2:00am and wakeup is 10:00am
-      if (now <= wakeup) summary = await this.today(PersonalModelService.day_labels[(when.getDay()-1) % 7]);
+      if (now <= wakeup) summary = await this.today(PersonalModelService.day_labels[Modulo.mod(when.getDay()-1, 7)]);
       else when.setDate(when.getDate() + 1);
     }
 
@@ -448,6 +453,14 @@ export class PersonalModelService {
     return false;
   }
 
+  private set_recommended_times(day:string, sleep_hour:number, sleep_min:number, wakeup_hour:number, wakeup_min:number) {
+    // var pad = function(n:number) {
+    //   return String(n).padStart(2, '0')
+    // };
+    // Preferences.set({key: day.toLowerCase(), value: `${pad(sleep_hour)}:${pad(sleep_min)} - ${pad(wakeup_hour)}:${pad(wakeup_min)}`})
+    Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${wakeup_hour}:${wakeup_min}`})
+  }
+
   // Shift sleep for day:string by minutes:number. Positive values shift it forward.
   // e.g. shift_sleep('mon', 30) could shift it from 10:30pm to 11:00pm
   // Returns false on failure (e.g. conflict with class)
@@ -465,8 +478,20 @@ export class PersonalModelService {
       }
       sleep_hour += (Math.floor(Math.abs(minutes) / 60) * Math.sign(minutes)) % 24;
 
-      if (await this.is_time_conflict(day, sleep_hour, sleep_min)) return false;
-      else Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${wakeup_hour}:${wakeup_min}`});
+      if (await this.is_time_conflict(day, sleep_hour, sleep_min)) {
+        const courses = this.get_courses_by_day(day);
+        var end:Date = new Date(courses[courses.length-1].time_end);
+        end.setMinutes(end.getMinutes() + (await this.WIND_DOWN_TIME()));
+
+        
+        if (end.getHours() == (await this.when_to_sleep()).getHours() && end.getMinutes() == (await this.when_to_sleep()).getMinutes()) {
+          return false;
+        } else {
+          this.set_recommended_times(day, end.getHours(), end.getMinutes(), wakeup_hour, wakeup_min);
+        }
+      } else {
+        this.set_recommended_times(day, sleep_hour, sleep_min, wakeup_hour, wakeup_min);
+      }
 
     } else {
       console.log('Could not change sleep time');
@@ -485,7 +510,7 @@ export class PersonalModelService {
       var [wakeup_hour, wakeup_min] = wakeup_time.split(':').map(Number);
 
       if (await this.is_time_conflict(day, sleep_hour, sleep_min)) return false;
-      else Preferences.set({key: day.toLowerCase(), value: `${hour}:${min} - ${wakeup_hour}:${wakeup_min}`});
+      else this.set_recommended_times(day, hour, min, wakeup_hour, wakeup_min);
 
     } else {
       console.log('Could not change sleep time');
@@ -496,7 +521,7 @@ export class PersonalModelService {
 
   // Shift wakeup for day:string by minutes:number. Positive values shift it forward.
   // e.g. shift_wakeup('mon', 30) could shift it from 8:00am to 8:30am
-  // Returns false on failure (e.g. conflict with class)
+  // Returns false on failure (e.g. conflict with class), but attempts to maximize wakeup
   async shift_wakeup(day:string, minutes:number) {
     const { value } = await Preferences.get({key: day.toLowerCase()});
     if (value) {
@@ -511,8 +536,20 @@ export class PersonalModelService {
       }
       wakeup_hour += (Math.floor(Math.abs(minutes) / 60) * Math.sign(minutes)) % 24;
 
-      if (await this.is_time_conflict(day, wakeup_hour, wakeup_min)) return false;
-      else Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${wakeup_hour}:${wakeup_min}`});
+      if (await this.is_time_conflict(day, wakeup_hour, wakeup_min)) {
+        const courses = this.get_courses_by_day(day);
+        var start:Date = new Date(courses[0].time_start);
+        start.setMinutes(start.getMinutes() - (await this.wind_up_time()));
+        
+        // If already maximized, return false, else optimize
+        if (start.getHours() == (await this.when_to_wakeup()).getHours() && start.getMinutes() == (await this.when_to_wakeup()).getMinutes()) {
+          return false;
+        } else {
+          this.set_recommended_times(day, sleep_hour, sleep_min, start.getHours(), start.getMinutes());
+        }
+      } else {
+        this.set_recommended_times(day, sleep_hour, sleep_min, wakeup_hour, wakeup_min);
+      }
 
     } else {
       console.log('Could not change wakeup time');
@@ -531,7 +568,7 @@ export class PersonalModelService {
       var [wakeup_hour, wakeup_min] = wakeup_time.split(':').map(Number);
 
       if (await this.is_time_conflict(day, wakeup_hour, wakeup_min)) return false;
-      else Preferences.set({key: day.toLowerCase(), value: `${sleep_hour}:${sleep_min} - ${hour}:${min}`});
+      else this.set_recommended_times(day, sleep_hour, sleep_min, hour, min);
 
     } else {
       console.log('Could not change wakeup time');
@@ -593,6 +630,9 @@ export class PersonalModelService {
       var course = PersonalModelService.courses[i];
       if (course.days[index]) arr.push(course);
     }
+    arr.sort((a:Course, b:Course) => {
+      return a.time_start.valueOf() - b.time_start.valueOf();
+    });
     return arr;
   }
 
@@ -676,6 +716,5 @@ export class PersonalModelService {
     Preferences.set({key: 'wind_up_time', value: `${minutes}`});
     // PersonalModelService.wind_up_time = minutes;
   }
-
 
 }

@@ -1,5 +1,7 @@
 import { PersonalModelService } from "../services/personal-model.service";
 
+import { Modulo } from "./modulo";
+
 export class Sleep {
 	time_sleep:Date;
 	time_wakeup:Date;
@@ -10,7 +12,7 @@ export class Sleep {
 	}
 
 	get day():string {
-		if (this.time_sleep.getHours() < 5) return PersonalModelService.day_labels[(this.time_sleep.getDay() - 1) % 7];
+		if (this.time_sleep.getHours() < 5) return PersonalModelService.day_labels[Modulo.mod(this.time_sleep.getDay() - 1, 7)];
 		else return PersonalModelService.day_labels[this.time_sleep.getDay()];
 	}
 
