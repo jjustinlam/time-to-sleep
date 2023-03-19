@@ -18,6 +18,8 @@ import { Health } from '@awesome-cordova-plugins/health/ngx';
 })
 export class SetupPage implements OnInit {
   public static slides = ['welcome', 'morning/night', 'course schedule', 'prep/commute', 'fitness', 'finish'];
+  private routeTo = 'pages/home';
+
   index:number = 0;
   slide:string;
   swiper:Swiper;
@@ -49,7 +51,8 @@ export class SetupPage implements OnInit {
       });
     } else {
       // window.location.href = '/pages/my-schedule';
-      this.router.navigateByUrl('pages/my-schedule');
+      // this.router.navigateByUrl('pages/my-schedule');
+      this.router.navigateByUrl(this.routeTo);
     }
   }
 
@@ -68,7 +71,7 @@ export class SetupPage implements OnInit {
       Preferences.set({key: 'wind_up_time', value: `${this.wind_up_time}`});
       AppComponent.active = true;
       // window.location.href = '/pages/my-schedule';
-      this.router.navigateByUrl('pages/my-schedule');
+      this.router.navigateByUrl(this.routeTo);
     } else {
       if (this.slide == 'morning/night' && this.prefers_morning === undefined) return;
       else if (this.slide == 'prep/commute' && this.wind_up_time === undefined) return;
