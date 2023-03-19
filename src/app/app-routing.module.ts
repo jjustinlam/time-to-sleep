@@ -14,27 +14,31 @@ const routes: Routes = [
   // },
   {
     path: 'pages/my-schedule',
-    loadChildren: () => import('./pages/my-schedule/my-schedule.module').then( m => m.MySchedulePageModule)
+    loadChildren: () => import('./pages/my-schedule/my-schedule.module').then(m => m.MySchedulePageModule)
   },
   {
     path: 'pages/overnight-sleep',
-    loadChildren: () => import('./pages/overnight-sleep/overnight-sleep.module').then( m => m.OvernightSleepPageModule)
+    loadChildren: () => import('./pages/overnight-sleep/overnight-sleep.module').then(m => m.OvernightSleepPageModule)
   },
   {
     path: 'pages/sleepiness',
-    loadChildren: () => import('./pages/sleepiness/sleepiness.module').then( m => m.SleepinessPageModule)
+    loadChildren: () => import('./pages/sleepiness/sleepiness.module').then(m => m.SleepinessPageModule)
   },
   {
     path: 'pages/settings',
-    loadChildren: () => import('./pages/settings/settings.module').then( m => m.SettingsPageModule)
+    loadChildren: () => import('./pages/settings/settings.module').then(m => m.SettingsPageModule)
   },
   {
     path: 'pages/setup',
-    loadChildren: () => import('./pages/setup/setup.module').then( m => m.SetupPageModule)
+    loadChildren: () => import('./pages/setup/setup.module').then(m => m.SetupPageModule)
   },
   {
     path: 'pages/coffee',
-    loadChildren: () => import('./pages/coffee/coffee.module').then( m => m.CoffeePageModule)
+    loadChildren: () => import('./pages/coffee/coffee.module').then(m => m.CoffeePageModule)
+  },
+  {
+    path: 'pages/home',
+    loadChildren: () => import('./pages/home/home.module').then(m => m.HomePageModule)
   },
 
 
@@ -46,4 +50,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

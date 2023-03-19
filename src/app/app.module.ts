@@ -12,6 +12,8 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { Health } from '@awesome-cordova-plugins/health/ngx';
 
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+
 
 @NgModule({
   declarations: [
@@ -21,9 +23,10 @@ import { Health } from '@awesome-cordova-plugins/health/ngx';
   imports: [BrowserModule, FormsModule, IonicModule.forRoot(), AppRoutingModule],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    Health
-],
+    Health,
+    LocalNotifications
+  ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AppModule {}
+export class AppModule { }
