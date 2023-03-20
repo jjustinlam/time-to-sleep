@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { LocalNotifications } from '@awesome-cordova-plugins/local-notifications';
+
 
 @Component({
     selector: 'app-home',
@@ -10,7 +11,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 export class HomePage {
     clickSub: any;
 
-    constructor(private localNotifications: LocalNotifications, private router:Router) { }
+    constructor(private router:Router) { }
 
     ngOnInit() {
         this.sleepinessNotifs();
@@ -20,7 +21,7 @@ export class HomePage {
     async sleepinessNotifs() {
         var allowed = false;
         try {
-            allowed = await this.localNotifications.requestPermission();
+            allowed = await LocalNotifications.requestPermission();
         } catch (e) {
             
         }
@@ -34,25 +35,25 @@ export class HomePage {
             var time2 = new Date(year, month, day, 14);
             var time3 = new Date(year, month, day, 18);
 
-            this.localNotifications.schedule({
+            LocalNotifications.schedule({
                 id: 1,
                 title: 'Log your morning sleepiness',
                 text: 'How tired are you?',
                 trigger: { at: new Date(time1) }
             });
-            this.localNotifications.schedule({
+            LocalNotifications.schedule({
                 id: 2,
                 title: 'Log your midday sleepiness',
                 text: 'How tired are you?',
                 trigger: { at: new Date(time2) }
             });
-            this.localNotifications.schedule({
+            LocalNotifications.schedule({
                 id: 3,
                 title: 'Log your evening sleepiness',
                 text: 'How tired are you?',
                 trigger: { at: new Date(time3) }
             });
-            this.localNotifications.on('click').subscribe(() => {
+            LocalNotifications.on('click').subscribe(() => {
                 this.router.navigateByUrl('pages/sleepiness');
             }); 
         }
